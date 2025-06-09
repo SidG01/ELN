@@ -7,11 +7,19 @@ body {
 
 .topbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   background-color: #1c1c1c;
   padding: 10px 20px;
   color: white;
+}
+
+.topbarRight {
+  justify-content: end;
+}
+
+.topbarLeft {
+  justify-content: left;
 }
 
 .logo {
@@ -53,6 +61,7 @@ body {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   font-size: 14px;
   line-height: 1.5;
+  cursor: pointer;
 }
 
 .card strong {

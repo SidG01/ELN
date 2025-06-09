@@ -15,7 +15,8 @@
   "author": "siddharthguddanti",
   "license": "MIT",
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "firebase": "^11.9.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.8.1",
