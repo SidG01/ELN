@@ -19,9 +19,45 @@ loadCard('Spin Column', 'hGL_v2_5', '6/2/2025', 'SpinColumnButton');
 
 
 
-
-
-
+function preStockPage() {
+    location.assign("Screens/PreStock/PreStock.html");
+}
+function workingStockPage() {
+    location.assign("Screens/WorkingStock/WorkingStock.html");
+}
+function antiBodyCPage() {
+    location.assign("Screens/AntibodyConjugation/AntibodyConjugation.html");
+}
+function buffersPage () {
+    location.assign("Screens/Buffers/Buffers.html");
+}
+function conjugationPage() {
+    location.assign("Screens/Conjugation/Conjugation.html");
+}
+function cryoPage() {
+    location.assign("Screens/Cryopreservation/Cryopreservation.html");
+}
+function foldingPage() {
+    location.assign("Screens/Folding/Folding.html");
+}
+function gelsPage() {
+    location.assign("Screens/Gels/Gels.html");
+}
+function genericPage() {
+    location.assign("Screens/Generic/Generic.html");
+}
+function pegPage() {
+    location.assign("Screens/PEG/PEG.html");
+}
+function proteinCPage() {
+    location.assign("Screens/ProteinConjugation/ProteinConjugation.html");
+}
+function scaffoldPage() {
+    location.assign("Screens/Scaffold/Scaffold.html");
+}
+function spinCPage() {
+    location.assign("Screens/SpinColumn/SpinColumn.html");
+}
 
 
 

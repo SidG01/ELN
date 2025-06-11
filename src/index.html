@@ -1,62 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="">
   <head>
     <meta charset="UTF-8" />
     <title>DNA Nanobots ELN</title>
     <link rel="stylesheet" href="index.css" />
-    <script>
-      import { initializeApp } from "firebase/app";
-      import { getFirestore } from "firebase/firestore";
-      import { getAnalytics } from "firebase/analytics";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
+<!--    <script>-->
+<!--      import { initializeApp } from "firebase/app";-->
+<!--      import { getFirestore } from "firebase/firestore";-->
+<!--      import { getAnalytics } from "firebase/analytics";-->
+<!--      // https://firebase.google.com/docs/web/setup#available-libraries-->
 
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-      const firebaseConfig = {
-        apiKey: "AIzaSyBkvths-7h1YZ2yG1uqnuIarjGsyQUUwWE",
-        authDomain: "dnadatabsedemo.firebaseapp.com",
-        projectId: "dnadatabsedemo",
-        storageBucket: "dnadatabsedemo.firebasestorage.app",
-        messagingSenderId: "562493683096",
-        appId: "1:562493683096:web:6865c6183c2b865059e7ed",
-        measurementId: "G-KS32N5FKJP"
-      };
+<!--      // Your web app's Firebase configuration-->
+<!--      // For Firebase JS SDK v7.20.0 and later, measurementId is optional-->
 
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-    </script>
+
+<!--      // Initialize Firebase-->
+<!--      const app = initializeApp(firebaseConfig);-->
+<!--      const db = getFirestore(app);-->
+<!--    </script>-->
 
   </head>
   <body>
   <div id="header"></div>
   <div class="card-grid">
-    <div id="PreStockButton" onclick="location.href='Screens/PreStock/PreStock.html'"></div>
+    <div id="PreStockButton" onclick="preStockPage()"></div>
 <!--    <div class="card"><strong>Working Stock</strong><br>Latest: hGL_4x4x4_F4<br><span>5/15/2025</span></div>-->
-    <div id="WorkingStockButton" onclick="location.href='Screens/WorkingStock/WorkingStock.html'"></div>
+    <div id="WorkingStockButton" onclick="workingStockPage()"></div>
 <!--    <div class="card"><strong>Buffers</strong><br>Latest: TBE<br><span>2/11/2025</span></div>-->
-    <div id="BuffersButton" onclick="location.href='Screens/Buffers/Buffers.html'"></div>
+    <div id="BuffersButton" onclick="buffersPage()"></div>
 <!--    <div class="card"><strong>PEG</strong><br>Latest: NKTwip<br><span>10/17/2024</span></div>-->
-    <div id="PEGButton" onclick="location.href='Screens/PEG/PEG.html'"></div>
+    <div id="PEGButton" onclick="pegPage()"></div>
 <!--    <div class="card"><strong>Gels</strong><br>Latest: A2H4<br><span>5/14/2025</span></div>-->
-    <div id="GelsButton" onclick="location.href='Screens/Gels/Gels.html'"></div>
+    <div id="GelsButton" onclick="gelsPage()"></div>
 <!--    <div class="card"><strong>Antibody Conjugation</strong><br>Latest: Transferrin-Seq3<br><span>5/13/2025</span></div>-->
-    <div id="AntibodyConjugationButton" onclick="location.href='Screens/AntibodyConjugation/AntibodyConjugation.html'"></div>
+    <div id="AntibodyConjugationButton" onclick="antiBodyCPage()"></div>
 <!--    <div class="card"><strong>Spin Column</strong><br>Latest: N/A<br><span>N/A</span></div>-->
-    <div id="SpinColumnButton" onclick="location.href='Screens/SpinColumn/SpinColumn.html'"></div>
+    <div id="SpinColumnButton" onclick="spinCPage()"></div>
 <!--    <div class="card"><strong>Folding</strong><br>Latest: hGL_4x4x4_F4<br><span>6/2/2025</span></div>-->
-    <div id="FoldingButton" onclick="location.href='Screens/Folding/Folding.html'"></div>
+    <div id="FoldingButton" onclick="foldingPage()"></div>
 <!--    <div class="card"><strong>Protein Conjugation</strong><br>Latest: N/A<br><span>N/A</span></div>-->
-    <div id="ProteinConjugationButton" onclick="location.href='Screens/ProteinConjugation/ProteinConjugation.html'"></div>
+    <div id="ProteinConjugationButton" onclick="proteinCPage()"></div>
 <!--    <div class="card"><strong>Generic</strong><br>Latest: GFP-ATP7B<br><span>6/3/2025</span></div>-->
-    <div id="GenericButton" onclick="location.href='Screens/Generic/Generic.html'"></div>
+    <div id="GenericButton" onclick="genericPage()"></div>
 <!--    <div class="card"><strong>Conjugation</strong><br>Latest: hGL 4x4x4-4Cy5<br><span>5/20/2025</span></div>-->
-    <div id="ConjugationButton" onclick="location.href='Screens/Conjugation/Conjugation.html'"></div>
+    <div id="ConjugationButton" onclick="conjugationPage()"></div>
 <!--    <div class="card"><strong>Cryopreservation</strong><br>Latest: C2C12<br><span>5/13/2025</span></div>-->
-    <div id="CryopreservationButton" onclick="location.href='Screens/Cryopreservation/Cryopreservation.html'"></div>
+    <div id="CryopreservationButton" onclick="cryoPage()"></div>
 <!--    <div class="card"><strong>Scaffold</strong><br>Latest: sGFP-PCR<br><span>6/3/2024</span></div>-->
-    <div id="ScaffoldButton" onclick="location.href='Screens/Scaffold/Scaffold.html'"></div>
+    <div id="ScaffoldButton" onclick="scaffoldPage()"></div>
   </div>
 
   <script src="runIndexComponents.js"></script>

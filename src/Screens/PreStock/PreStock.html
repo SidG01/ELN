@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="">
 <head>
     <meta charset="UTF-8" />
     <title>Pre Stock</title>
@@ -9,13 +9,113 @@
 <body>
     <div id="header"></div>
 
-    <div class="card-grid">
-    <div class="card">
-        <strong>PreStock</strong><br>
-        Created on 6/2/2025<br>
-        Description: Inventory data for v2_5 stock version.
-    </div>
-    </div>
+    <main>
+        <div class="top-row">
+            <div class="dropdown-group">
+                <label>Structure / Project Base
+                    <select>
+                        <option>CMV_EGFP_Luciferase</option>
+                        <option>Horse</option>
+                        <option>DOVAC</option>
+                        <option>THWIP</option>
+                        <option>hCMVGFP</option>
+                    </select>
+                </label>
+                <label>Working Stock
+                    <select>
+                        <option>hGL_v2_5</option>
+                    </select>
+                </label>
+                <label>PS Name
+                    <select>
+                        <option>C-ITRCore</option>
+                    </select>
+                </label>
+                <label>PS Short for Batch
+                    <select>
+                        <option>C-ITRCore</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+
+        <div class="batch-field">
+            <label>Batch #
+                <input type="text" value="hGL_v2_5-PSC-ITRCore-20250602PH">
+            </label>
+        </div>
+
+        <div class="info-columns">
+            <div class="info-card">
+                <div class="info-name">Plate</div>
+                <div class="info-divider"></div>
+                <div class="info-text">hConst 1</div>
+                <div class="info-description">description</div>
+                <div class="info-text">hConst 1</div>
+                <div class="info-description">description</div>
+                <div class="info-text">hConst 1</div>
+                <div class="info-description">description</div>
+                <div class="info-text">Tubes</div>
+                <div class="info-description">description</div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-name">From</div>
+                <div class="info-divider"></div>
+                <div class="info-text">A1</div>
+                <div class="info-description">description</div>
+                <div class="info-text">A4</div>
+                <div class="info-description">description</div>
+                <div class="info-text">B4</div>
+                <div class="info-description">description</div>
+                <div class="info-text">3 ITR Tubes</div>
+                <div class="info-description">description</div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-name">To</div>
+                <div class="info-divider"></div>
+                <div class="info-text">A2</div>
+                <div class="info-description">description</div>
+                <div class="info-text">B3</div>
+                <div class="info-description">description</div>
+                <div class="info-text">C4</div>
+                <div class="info-description">description</div>
+                <div class="info-text">N/A</div>
+                <div class="info-description">description</div>
+            </div>
+
+            <div class="form-card">
+                <label># of Oligos<input type="text" value="31"></label>
+                <label>Date, Time<input type="text" value="6/2/2025 13:57"></label>
+                <label>V Total (uL)<input type="text" value="620"></label>
+                <label>Target Volume to Structure Fold (uL)<input type="text" value="10000"></label>
+                <label>Volume Taken From Each Well<input type="text" value="20"></label>
+            </div>
+
+            <div class="form-card">
+                <label>Date / Time<input type="text" value="June 2nd 2025 1:57 PM"></label>
+                <label>Assigned To</label>
+                <div class="tags">
+                    <span id="employeeBtn0" onclick="employeeClicked(0)" class="tag">PH</span>
+                    <span id="employeeBtn1" onclick="employeeClicked(1)" class="tag">SG</span>
+                    <span id="employeeBtn2" onclick="employeeClicked(2)" class="tag">KT</span>
+                    <span id="employeeBtn3" onclick="employeeClicked(3)" class="tag">CL</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="notes-section">
+            <label>Notes</label>
+            <textarea placeholder="Value"></textarea>
+        </div>
+
+        <div class="bottom-actions">
+            <button class="procedure">📄 Procedure</button>
+            <button class="upload">⤴ Upload</button>
+        </div>
+    </main>
 
     <div id="back-button-container" onclick="location.href='../../index.html'">
         <button id="back-button">← Back</button>
