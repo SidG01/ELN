@@ -1,5 +1,22 @@
 // file to load all components used in index.html
 
+// writing to the database
+const db = firebase.firestore();
+db.collection("PreStock").add({
+    first: "Ada",
+    last: "Lovelace",
+    born: 1815
+})
+
+// reading from the databse
+db.collection("PreStock").get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+        console.log(`${doc.id} => ${doc.data()}`);
+    });
+});
+
+
+
 
 
 loadCard('Pre-Stock', 'hGL_v2_5', '5/15/2025', 'PreStockButton');
