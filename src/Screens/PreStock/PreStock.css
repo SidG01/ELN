@@ -5,6 +5,10 @@ body {
     padding: 0;
 }
 
+.batchNumber {
+    display: flex;
+}
+
 nav button {
     margin-left: 10px;
     padding: 8px 12px;

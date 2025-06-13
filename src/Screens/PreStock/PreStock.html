@@ -12,36 +12,25 @@
     <main>
         <div class="top-row">
             <div class="dropdown-group">
-                <label>Structure / Project Base
-                    <select>
-                        <option>CMV_EGFP_Luciferase</option>
-                        <option>Horse</option>
-                        <option>DOVAC</option>
-                        <option>THWIP</option>
-                        <option>hCMVGFP</option>
-                    </select>
+                <label id="psBaseC">Structure / Project Base
+                    <select id="psBase" onchange="selectedOption('psBase')"></select>
                 </label>
-                <label>Working Stock
-                    <select>
-                        <option>hGL_v2_5</option>
-                    </select>
+                <label id="workingStockC">Working Stock
+                    <select id="workingStock" onchange="selectedOption('workingStock')"></select>
                 </label>
-                <label>PS Name
-                    <select>
-                        <option>C-ITRCore</option>
-                    </select>
+                <label id="psNameC">PS Name
+                    <select id="psName" onchange="selectedOption('psName')"></select>
                 </label>
-                <label>PS Short for Batch
-                    <select>
-                        <option>C-ITRCore</option>
-                    </select>
+                <label id="psShortC">PS Short for Batch
+                    <select id="psShort" onchange="selectedOption('psShort')"></select>
                 </label>
             </div>
         </div>
 
         <div class="batch-field">
             <label>Batch #
-                <input type="text" value="hGL_v2_5-PSC-ITRCore-20250602PH">
+<!--                value="hGL_v2_5-PSC-ITRCore-20250602PH"-->
+                <input id="batchNumber" type="text">
             </label>
         </div>
 
@@ -121,7 +110,7 @@
         <button id="back-button">← Back</button>
     </div>
 
-
+    <script src="../../Components/runComponents.js"></script>
     <script src="PreStock.js"></script>
 
 </body>
