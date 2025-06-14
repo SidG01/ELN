@@ -13,16 +13,25 @@
         <div class="top-row">
             <div class="dropdown-group">
                 <label id="psBaseC">Structure / Project Base
-                    <select id="psBase" onchange="selectedOption('psBase')"></select>
+                    <select id="psBase" onchange="selectedOption('psBase')">
+                        <option>Choose First</option>
+                    </select>
                 </label>
                 <label id="workingStockC">Working Stock
-                    <select id="workingStock" onchange="selectedOption('workingStock')"></select>
+                    <select id="workingStock" onchange="selectedOption('workingStock')">
+                        <option>Choose Project Base</option>
+                        <option>test Base</option>
+                    </select>
                 </label>
                 <label id="psNameC">PS Name
-                    <select id="psName" onchange="selectedOption('psName')"></select>
+                    <select id="psName" onchange="selectedOption('psName')">
+                        <option>Choose Working Stock</option>
+                    </select>
                 </label>
                 <label id="psShortC">PS Short for Batch
-                    <select id="psShort" onchange="selectedOption('psShort')"></select>
+                    <select id="psShort" onchange="selectedOption('psShort')">
+                        <option>Choose Working Stock</option>
+                    </select>
                 </label>
             </div>
         </div>
@@ -35,7 +44,7 @@
         </div>
 
         <div class="info-columns">
-            <div class="info-card">
+            <div class="info-card" id="PlateCard">
                 <div class="info-name">Plate</div>
                 <div class="info-divider"></div>
                 <div class="info-text">hConst 1</div>
@@ -48,7 +57,7 @@
                 <div class="info-description">description</div>
             </div>
 
-            <div class="info-card">
+            <div class="info-card" id="FromCard">
                 <div class="info-name">From</div>
                 <div class="info-divider"></div>
                 <div class="info-text">A1</div>
@@ -61,7 +70,7 @@
                 <div class="info-description">description</div>
             </div>
 
-            <div class="info-card">
+            <div class="info-card" id="ToCard">
                 <div class="info-name">To</div>
                 <div class="info-divider"></div>
                 <div class="info-text">A2</div>
@@ -109,6 +118,10 @@
     <div id="back-button-container" onclick="location.href='../../index.html'">
         <button id="back-button">← Back</button>
     </div>
+
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore-compat.js"></script>
+    <script src="../../firebaseConfig.js"></script>
 
     <script src="../../Components/runComponents.js"></script>
     <script src="PreStock.js"></script>
