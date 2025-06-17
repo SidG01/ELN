@@ -140,13 +140,18 @@ main {
     margin-left: 20px;
 }
 
+.volumeInfo {
+    font-size: 14px;
+    color: #999;
+}
+
 .form-card label {
     font-weight: bold;
     font-size: 15px;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .form-card input {
@@ -181,7 +186,7 @@ main {
 }
 
 .notes-section textarea {
-    width: 50%;
+    width: 55%;
     height: 60px;
     padding: 10px;
     border-radius: 10px;
@@ -271,4 +276,68 @@ main {
 
 #back-button:hover {
     background-color: #555;
+}
+
+.custom-modal {
+    width: 400px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    font-family: sans-serif;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.modal-body {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #444;
+}
+
+.modal-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.outline-btn {
+    background: #f3f3f3;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    padding: 6px 16px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filled-btn {
+    background: #222;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 16px;
+    cursor: pointer;
+    font-size: 14px;
 }
