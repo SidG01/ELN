@@ -9,6 +9,7 @@ let currentPsShort = "";
 let batchNumber = "";
 
 let editMode = false;
+let createMode = false;
 
 let fillArray = []
 let employees = []
@@ -98,6 +99,7 @@ function fetchAndFill(path, index, getData) {
 // Start the process with first selection
 fetchAndFill(db.collection("PreStock").doc("NewExperiment").collection(fillContext[0]).get(),0, false);
 document.getElementById("successModal").style.display = "none";
+document.getElementById("oligos").disabled = true;
 
 // fills employeeUsed with all employees that are selected
 function employeeClicked(index) {
@@ -244,8 +246,15 @@ function changeSelection(option, checkIndex) {
 function fillBatchNumber(psN, psB, WS, psS) {
     // where does PSC come from?
     const d = new Date();
-    const day = d.getDate();
-    batchNumber = WS + "-" + "PSC" + "-" + psS + "-" + d.getDate() + "/" + (d.getMonth()) + "/" + d.getFullYear();
+    let month = d.getMonth() + 1;
+    let day = d.getDate();
+    if (d.getMonth() < 10) {
+        month = "0" + (d.getMonth() + 1);
+    }
+    if (d.getDate() < 10) {
+        day = "0" + d.getDate();
+    }
+    batchNumber = WS + "-" + "PSC" + "-" + psS + "." + (month) + (day) + (d.getFullYear()) + ".";
     for (let i = 0; i < employeeUsed.length; i++) {
         batchNumber += employeeUsed[i]
     }
@@ -290,6 +299,281 @@ function fillMaterials(cardId, content, description) {
     }
 }
 
+function addCardContent() {
+    let infoCard;
+
+    for(let i = 0; i < materialsID.length; i++) {
+        infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+        const children = infoCard.children;
+        if (children[children.length - 1].classList.contains('action-button')) {
+            infoCard.removeChild(children[children.length - 1]);
+
+        }
+        const textDiv = document.createElement('div');
+        textDiv.className = 'info-text';
+        textDiv.textContent = "Add Content Here";
+
+        const descDiv = document.createElement('div');
+        descDiv.className = 'info-description';
+        descDiv.textContent = "Add Description Here";
+
+        infoCard.appendChild(textDiv);
+        infoCard.appendChild(descDiv);
+
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = div.textContent;
+                input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                input.style.border = "2px solid green";
+                input.style.fontSize = "15px";
+                input.style.gap = "4px";
+                const field = card.id;
+                input.setAttribute('data-card', field);
+                div.replaceWith(input);
+            });
+        });
+
+        const button = document.createElement('button');
+        button.className = 'action-button'; // Optional: style class
+        button.textContent = 'Add More Content';
+
+        button.onclick = addCardContent;
+
+        infoCard.appendChild(button);
+    }
+
+}
+
+function createNew() {
+    const arrays = {
+        plateArray: [],
+        plateDescArray: [],
+        fromArray: [],
+        fromDescArray: [],
+        toArray: [],
+        toDescArray: [],
+
+    };
+    if (!createMode) {
+        createMode = true;
+
+        // clear dropdowns
+        for(let i = 0; i < fillContext.length; i++) {
+            let options = document.getElementById(fillContext[i]);
+            for (let i = options.options.length - 1; i >= 0; i--) {
+                options.remove(i); // Clear existing options
+            }
+            let newOption = document.createElement("option");
+            options.options.add(newOption);
+        }
+        let infoCard;
+        for (let i = 0; i < materialsID.length; i++) {
+            infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+            const children = infoCard.children;
+            for (let i = children.length - 1; i >= 0; i--) {
+                if (!children[i].classList.contains('info-name') && !children[i].classList.contains('info-divider')) {
+                    infoCard.removeChild(children[i]);
+                }
+            }
+        }
+
+        addCardContent(infoCard)
+
+        document.getElementById("createBtn").innerHTML = "SAVE NEW";
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = div.textContent;
+                input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                input.style.border = "2px solid green";
+                input.style.fontSize = "15px";
+                input.style.gap = "4px";
+                const field = card.id;
+                input.setAttribute('data-card', field);
+                div.replaceWith(input);
+            });
+        });
+        document.getElementById("oligos").disabled = false;
+        document.getElementById("oligos").style.border = "2px solid green";
+
+        const dropdownGroup = document.querySelector('.dropdown-group');
+        const selects = dropdownGroup.querySelectorAll('select');
+
+        selects.forEach(select => {
+            // Hide the original select
+            select.style.display = 'none';
+
+            // Create a container to hold the inputs
+            const inputContainer = document.createElement('div');
+            inputContainer.className = 'input-container';
+
+            // Create an input for each option
+            Array.from(select.options).forEach(option => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = option.text;
+                input.className = 'option-edit';
+                inputContainer.appendChild(input);
+            });
+
+            select.dataset.inputContainerId = `inputs-${select.id}`;
+            inputContainer.id = select.dataset.inputContainerId;
+            select.parentNode.appendChild(inputContainer);
+        });
+    }
+    else {
+        createMode = false;
+        document.getElementById("oligos").style.border = "";
+        document.getElementById("oligos").disabled = true;
+        document.getElementById("createBtn").innerHTML = "CREATE NEW";
+        numOligos = parseInt(document.getElementById("oligos").value, 10);
+        for(let i = 0; i < materialsID.length; i++) {
+            infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+            const children = infoCard.children;
+            infoCard.removeChild(children[children.length - 1]);
+        }
+        for (const key in arrays) {
+            arrays[key] = [];
+        }
+        document.querySelectorAll('.info-card').forEach(card => {
+            const cardId = card.id.toLowerCase().replace("card", "");
+
+            const inputs = card.querySelectorAll('input');
+            inputs.forEach((input, index) => {
+                const isText = input.getAttribute('data-type') === 'text';
+                const arrayName = cardId + (isText ? 'Array' : 'DescArray');
+
+                if (arrays[arrayName]) {
+                    arrays[arrayName].push(input.value);
+                }
+
+                const newDiv = document.createElement('div');
+                newDiv.className = isText ? 'info-text' : 'info-description';
+                newDiv.textContent = input.value;
+                input.replaceWith(newDiv);
+            });
+        });
+
+        const dropdownGroup = document.querySelector('.dropdown-group');
+        const selects = dropdownGroup.querySelectorAll('select');
+
+        selects.forEach(select => {
+            const inputContainerId = select.dataset.inputContainerId;
+            const inputContainer = document.getElementById(inputContainerId);
+            const inputs = inputContainer.querySelectorAll('input');
+
+            // Clear current select options
+            select.innerHTML = '';
+
+            inputs.forEach(input => {
+                const option = document.createElement('option');
+                option.text = input.value;
+                select.add(option);
+            });
+
+            // Remove inputs and show select again
+            inputContainer.remove();
+            select.style.display = 'inline-block';
+        });
+        let firebaseIDLink = {
+            plateArray: "Plate",
+            plateDescArray: "PlateDesc",
+            fromArray: "From",
+            fromDescArray: "FromDesc",
+            toArray: "To",
+            toDescArray: "ToDesc",
+        };
+        let newDatabaseData = {};
+
+        for (const tempArrayName in firebaseIDLink) {
+            newDatabaseData[firebaseIDLink[tempArrayName]] = arrays[tempArrayName];
+        }
+
+        let newPsBase = document.getElementById("psBase").value.toString();
+        let newWorkingStock = document.getElementById("workingStock").value.toString();
+        let newPsName = document.getElementById("psName").value.toString();
+        let newPsShort = document.getElementById("psShort").value.toString();
+
+        let newOligos = document.getElementById("oligos").value.toString();
+        let newNotes = document.getElementById("notes").value.toString();
+
+        // This ensures the document exists
+        db.collection("PreStock")
+            .doc("NewExperiment")
+            .collection("psBase")
+            .doc(newPsBase) // or your dynamic variable `newPsBase`
+            .set({ createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+            .then(() => {
+                console.log("testbase now exists with data");
+            });
+        db.collection("PreStock")
+            .doc("NewExperiment")
+            .collection("psBase")
+            .doc(newPsBase) // or your dynamic psBase variable
+            .collection("workingStock")
+            .doc(newWorkingStock)   // or your workingStock variable
+            .set({ createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+            .then(() => {
+                console.log("testws now exists in Firestore");
+            });
+
+        let docRef = db
+            .collection("PreStock")
+            .doc("NewExperiment")
+            .collection("psBase")
+            .doc(newPsBase) // variable with your psBase ID
+            .collection("workingStock")
+            .doc(newWorkingStock) // variable with your workingStock ID
+            .collection("psShort")
+            .doc(newPsShort);
+
+        docRef.set(newDatabaseData)
+            .then(() => {
+                console.log("Data uploaded successfully!");
+            })
+            .catch((error) => {
+                console.error("Error uploading document:", error);
+            });
+
+        docRef.update({
+            Oligos: newOligos,
+            Notes: newNotes,
+        }).then(() => {
+            console.log("Oligos updated successfully!");
+        }).catch((error) => {
+            console.error("Error updating Oligos:", error);
+        });
+
+        docRef = db
+            .collection("PreStock")
+            .doc("NewExperiment")
+            .collection("psBase")
+            .doc(newPsBase) // variable with your psBase ID
+            .collection("workingStock")
+            .doc(newWorkingStock) // variable with your workingStock ID
+            .collection("psName")
+            .doc(newPsName);
+
+        docRef.set({})
+            .then(() => {
+                console.log("Document created at custom path.");
+            })
+            .catch((error) => {
+                console.error("Error creating document: ", error);
+            });
+
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "New Template Created";
+        document.getElementById("modalTitle").style.color = "green"
+        document.getElementById("modalBody").textContent = "You can now use this template for future Pre-Stock entries.";
+        fetchAndFill(db.collection("PreStock").doc("NewExperiment").collection(fillContext[0]).get(),0, false);
+        document.getElementById("oligos").disabled = true;
+    }
+}
+
 function clickedEdit() {
     const arrays = {
         plateArray: [],
@@ -316,7 +600,7 @@ function clickedEdit() {
                 div.replaceWith(input);
             });
         });
-
+        document.getElementById("oligos").disabled = false;
         document.getElementById("oligos").style.border = "2px solid green";
 
         // const dropdownGroup = document.querySelector('.dropdown-group');
@@ -351,6 +635,7 @@ function clickedEdit() {
         editMode = false;
         document.getElementById("editBtn").innerHTML = "EDIT";
         document.getElementById("oligos").style.border = "";
+        document.getElementById("oligos").disabled = true;
         numOligos = parseInt(document.getElementById("oligos").value, 10);
         for (const key in arrays) {
             arrays[key] = [];
@@ -406,8 +691,9 @@ function clickedEdit() {
             console.error("Error updating Oligos:", error);
         });
         document.getElementById("successModal").style.display = "block";
-        document.getElementById("modalTitle").textContent = "Data saved successfully to the Database";
-        document.getElementById("modalBody").textContent = "Navigate through history in the nav bar OR search using the provided options";
+        document.getElementById("modalTitle").textContent = "Edit saved successfully to the Database";
+        document.getElementById("modalTitle").style.color = "green"
+        document.getElementById("modalBody").textContent = "This change will now be reflected in this Pre-Stock template.";
 
         // const dropdownGroup = document.querySelector('.dropdown-group');
         // const selects = dropdownGroup.querySelectorAll('select');
@@ -430,6 +716,66 @@ function clickedEdit() {
         //     inputContainer.remove();
         //     select.style.display = 'inline-block';
         // });
+    }
+}
+
+function upload() {
+    let safeToUpload = true;
+    if (fillCheck.includes(false)) {
+        safeToUpload = false;
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Selection";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please make sure all selections are made before saving.";
+    }
+    else if (employeeUsed.length === 0) {
+        safeToUpload = false;
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Employee Selection";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please select at least one employee before saving.";
+    }
+    else {
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        const d = new Date();
+        let month = months[d.getMonth()];
+        console.log(d.getFullYear())
+        const path = db.collection("PreStock")
+            .doc(d.getFullYear().toString())
+            .collection(month)
+            .doc(batchNumber.toString());
+        console.log(path);
+
+        const newData = {
+            Plate: plateArray,
+            PlateDesc: plateDescArray,
+            From: fromArray,
+            FromDesc: fromDescArray,
+            To: toArray,
+            ToDesc: toDescArray,
+            Oligos: numOligos,
+            Base: currentPsBase,
+            WorkingStock: currentWorkingStock,
+            Name: currentPsName,
+            Short: currentPsShort,
+            TVolume: document.getElementById("Vtarget").value,
+            VWell: document.getElementById("Vwell").value,
+            VTotal: document.getElementById("Vtotal").value,
+            Employees: employeeUsed,
+            Notes: document.getElementById("notes").value,
+        }
+        path.set(newData)
+            .then(() => {
+                console.log("Data successfully uploaded!");
+            })
+            .catch((error) => {
+                console.error("Error uploading document:", error);
+            });
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Successfully uploaded experiment!";
+        document.getElementById("modalTitle").style.color = "green"
+        document.getElementById("modalBody").textContent = "Navigate through history in the nav bar OR search using the provided options";
     }
 }
 

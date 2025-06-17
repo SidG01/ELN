@@ -12,7 +12,7 @@
     <div class="nav-buttons">
         <button>Inventory</button>
         <button>Report Bug / Suggestion</button>
-        <button class="user">SG</button>
+        <button id="createBtn" class="user" onclick="createNew()" >CREATE NEW</button>
         <button id="editBtn" onclick="clickedEdit()" class="edit">EDIT</button>
     </div>
 </div>
@@ -77,7 +77,6 @@
             </div>
 
             <div class="form-card">
-                <label>Date / Time<input type="text" value="June 2nd 2025 1:57 PM"></label>
                 <label>Assigned To</label>
                 <div class="tags">
                     <span id="employeeBtn0" onclick="employeeClicked(0)" class="tag">PH</span>
@@ -96,7 +95,7 @@
 
         <div class="bottom-actions">
             <button class="procedure">📄 Procedure</button>
-            <button class="upload">⤴ Upload</button>
+            <button class="upload" onclick="upload()" >⤴ Upload</button>
         </div>
     </main>
 

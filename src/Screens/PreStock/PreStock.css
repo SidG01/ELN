@@ -341,3 +341,21 @@ main {
     cursor: pointer;
     font-size: 14px;
 }
+
+.card-span-button-container {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: center; /* or flex-start if you want it aligned to Plate card */
+    margin-top: 10px;
+}
+
+.card-span-button {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
