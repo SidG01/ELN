@@ -82,7 +82,7 @@ function fetchAndFill(path, index, getData) {
     else {
         path.then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
-                fillArray.push(doc.id); // or doc.data()
+                fillArray.push(doc.id);
             });
             fill(fillContext[index], fillArray, true);
             if (index === 2) {
@@ -787,6 +787,3 @@ function changedVolume() {
 function closeModal() {
     document.getElementById("successModal").style.display = "none";
 }
-
-
-
