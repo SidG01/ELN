@@ -583,139 +583,146 @@ function clickedEdit() {
         toArray: [],
         toDescArray: []
     };
-    if (!editMode) {
-        editMode = true;
-        document.getElementById("editBtn").innerHTML = "SAVE";
-        document.querySelectorAll('.info-card').forEach(card => {
-            card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = div.textContent;
-                input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
-                input.style.border = "2px solid green";
-                input.style.fontSize = "15px";
-                input.style.gap = "4px";
-                const field = card.id;
-                input.setAttribute('data-card', field);
-                div.replaceWith(input);
+    if (!fillCheck.includes(false)) {
+        if (!editMode) {
+            editMode = true;
+            document.getElementById("editBtn").innerHTML = "SAVE";
+            document.querySelectorAll('.info-card').forEach(card => {
+                card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = div.textContent;
+                    input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                    input.style.border = "2px solid green";
+                    input.style.fontSize = "15px";
+                    input.style.gap = "4px";
+                    const field = card.id;
+                    input.setAttribute('data-card', field);
+                    div.replaceWith(input);
+                });
             });
-        });
-        document.getElementById("oligos").disabled = false;
-        document.getElementById("oligos").style.border = "2px solid green";
+            document.getElementById("oligos").disabled = false;
+            document.getElementById("oligos").style.border = "2px solid green";
 
-        // const dropdownGroup = document.querySelector('.dropdown-group');
-        // const selects = dropdownGroup.querySelectorAll('select');
-        //
-        // selects.forEach(select => {
-        //     // Hide the original select
-        //     select.style.display = 'none';
-        //
-        //     // Create a container to hold the inputs
-        //     const inputContainer = document.createElement('div');
-        //     inputContainer.className = 'input-container';
-        //
-        //     // Create an input for each option
-        //     Array.from(select.options).forEach(option => {
-        //         const input = document.createElement('input');
-        //         input.type = 'text';
-        //         input.value = option.text;
-        //         input.className = 'option-edit';
-        //         inputContainer.appendChild(input);
-        //     });
-        //
-        //     // Store reference on the select for later access
-        //     select.dataset.inputContainerId = `inputs-${select.id}`;
-        //     inputContainer.id = select.dataset.inputContainerId;
-        //
-        //     // Insert input container after the select
-        //     select.parentNode.appendChild(inputContainer);
-        // });
+            // const dropdownGroup = document.querySelector('.dropdown-group');
+            // const selects = dropdownGroup.querySelectorAll('select');
+            //
+            // selects.forEach(select => {
+            //     // Hide the original select
+            //     select.style.display = 'none';
+            //
+            //     // Create a container to hold the inputs
+            //     const inputContainer = document.createElement('div');
+            //     inputContainer.className = 'input-container';
+            //
+            //     // Create an input for each option
+            //     Array.from(select.options).forEach(option => {
+            //         const input = document.createElement('input');
+            //         input.type = 'text';
+            //         input.value = option.text;
+            //         input.className = 'option-edit';
+            //         inputContainer.appendChild(input);
+            //     });
+            //
+            //     // Store reference on the select for later access
+            //     select.dataset.inputContainerId = `inputs-${select.id}`;
+            //     inputContainer.id = select.dataset.inputContainerId;
+            //
+            //     // Insert input container after the select
+            //     select.parentNode.appendChild(inputContainer);
+            // });
+        } else {
+            editMode = false;
+            document.getElementById("editBtn").innerHTML = "EDIT";
+            document.getElementById("oligos").style.border = "";
+            document.getElementById("oligos").disabled = true;
+            numOligos = parseInt(document.getElementById("oligos").value, 10);
+            for (const key in arrays) {
+                arrays[key] = [];
+            }
+            document.querySelectorAll('.info-card').forEach(card => {
+                const cardId = card.id.toLowerCase().replace("card", "");
+
+                const inputs = card.querySelectorAll('input');
+                inputs.forEach((input, index) => {
+                    const isText = input.getAttribute('data-type') === 'text';
+                    const arrayName = cardId + (isText ? 'Array' : 'DescArray');
+
+                    if (arrays[arrayName]) {
+                        arrays[arrayName].push(input.value);
+                    }
+
+                    const newDiv = document.createElement('div');
+                    newDiv.className = isText ? 'info-text' : 'info-description';
+                    newDiv.textContent = input.value;
+                    input.replaceWith(newDiv);
+                });
+            });
+
+            let firebaseIDLink = {
+                plateArray: "Plate",
+                plateDescArray: "PlateDesc",
+                fromArray: "From",
+                fromDescArray: "FromDesc",
+                toArray: "To",
+                toDescArray: "ToDesc",
+            };
+            let newDatabaseData = {};
+
+            for (const tempArrayName in firebaseIDLink) {
+                newDatabaseData[firebaseIDLink[tempArrayName]] = arrays[tempArrayName];
+            }
+            const docRef = db.collection("PreStock").doc("NewExperiment").collection(fillContext[0]).doc(currentPsBase)
+                .collection(fillContext[1]).doc(currentWorkingStock).collection(fillContext[3]).doc(currentPsShort);
+            docRef.set(newDatabaseData, {merge: true})
+                .then(() => {
+                    console.log("Data saved successfully to Firebase");
+                })
+                .catch((error) => {
+                    console.error("Error saving to Firebase:", error);
+                    displayTitle = "Error saving to Firebase:"
+                    displayBody = error
+                });
+            docRef.update({
+                Oligos: numOligos,
+            }).then(() => {
+                console.log("Oligos updated successfully!");
+            }).catch((error) => {
+                console.error("Error updating Oligos:", error);
+            });
+            document.getElementById("successModal").style.display = "block";
+            document.getElementById("modalTitle").textContent = "Edit saved successfully to the Database";
+            document.getElementById("modalTitle").style.color = "green"
+            document.getElementById("modalBody").textContent = "This change will now be reflected in this Pre-Stock template.";
+
+            // const dropdownGroup = document.querySelector('.dropdown-group');
+            // const selects = dropdownGroup.querySelectorAll('select');
+            //
+            // selects.forEach(select => {
+            //     const inputContainerId = select.dataset.inputContainerId;
+            //     const inputContainer = document.getElementById(inputContainerId);
+            //     const inputs = inputContainer.querySelectorAll('input');
+            //
+            //     // Clear current select options
+            //     select.innerHTML = '';
+            //
+            //     inputs.forEach(input => {
+            //         const option = document.createElement('option');
+            //         option.text = input.value;
+            //         select.add(option);
+            //     });
+            //
+            //     // Remove inputs and show select again
+            //     inputContainer.remove();
+            //     select.style.display = 'inline-block';
+            // });
+        }
     }
     else {
-        editMode = false;
-        document.getElementById("editBtn").innerHTML = "EDIT";
-        document.getElementById("oligos").style.border = "";
-        document.getElementById("oligos").disabled = true;
-        numOligos = parseInt(document.getElementById("oligos").value, 10);
-        for (const key in arrays) {
-            arrays[key] = [];
-        }
-        document.querySelectorAll('.info-card').forEach(card => {
-            const cardId = card.id.toLowerCase().replace("card", "");
-
-            const inputs = card.querySelectorAll('input');
-            inputs.forEach((input, index) => {
-                const isText = input.getAttribute('data-type') === 'text';
-                const arrayName = cardId + (isText ? 'Array' : 'DescArray');
-
-                if (arrays[arrayName]) {
-                    arrays[arrayName].push(input.value);
-                }
-
-                const newDiv = document.createElement('div');
-                newDiv.className = isText ? 'info-text' : 'info-description';
-                newDiv.textContent = input.value;
-                input.replaceWith(newDiv);
-            });
-        });
-
-        let firebaseIDLink = {
-            plateArray: "Plate",
-            plateDescArray: "PlateDesc",
-            fromArray: "From",
-            fromDescArray: "FromDesc",
-            toArray: "To",
-            toDescArray: "ToDesc",
-        };
-        let newDatabaseData = {};
-
-        for (const tempArrayName in firebaseIDLink) {
-            newDatabaseData[firebaseIDLink[tempArrayName]] = arrays[tempArrayName];
-        }
-        const docRef = db.collection("PreStock").doc("NewExperiment").collection(fillContext[0]).doc(currentPsBase)
-            .collection(fillContext[1]).doc(currentWorkingStock).collection(fillContext[3]).doc(currentPsShort);
-        docRef.set(newDatabaseData, { merge: true })
-            .then(() => {
-                console.log("Data saved successfully to Firebase");
-            })
-            .catch((error) => {
-                console.error("Error saving to Firebase:", error);
-                displayTitle = "Error saving to Firebase:"
-                displayBody = error
-            });
-        docRef.update({
-            Oligos: numOligos,
-        }).then(() => {
-            console.log("Oligos updated successfully!");
-        }).catch((error) => {
-            console.error("Error updating Oligos:", error);
-        });
         document.getElementById("successModal").style.display = "block";
-        document.getElementById("modalTitle").textContent = "Edit saved successfully to the Database";
-        document.getElementById("modalTitle").style.color = "green"
-        document.getElementById("modalBody").textContent = "This change will now be reflected in this Pre-Stock template.";
-
-        // const dropdownGroup = document.querySelector('.dropdown-group');
-        // const selects = dropdownGroup.querySelectorAll('select');
-        //
-        // selects.forEach(select => {
-        //     const inputContainerId = select.dataset.inputContainerId;
-        //     const inputContainer = document.getElementById(inputContainerId);
-        //     const inputs = inputContainer.querySelectorAll('input');
-        //
-        //     // Clear current select options
-        //     select.innerHTML = '';
-        //
-        //     inputs.forEach(input => {
-        //         const option = document.createElement('option');
-        //         option.text = input.value;
-        //         select.add(option);
-        //     });
-        //
-        //     // Remove inputs and show select again
-        //     inputContainer.remove();
-        //     select.style.display = 'inline-block';
-        // });
+        document.getElementById("modalTitle").textContent = "Error: Missing Selection";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please make sure all selections are made before editing.";
     }
 }
 

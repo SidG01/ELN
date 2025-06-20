@@ -10,13 +10,14 @@ let employeeUsed = [];
 
 let currentWS = "CHOOSE WORKING STOCK";
 
-let materialsID = ["PreStocks", "Parts", "Volume"]
+let materialsID = ["Prestocks", "Parts", "Volume"]
 let prestocksArray = [];
-let preStockDescArray = [];
+let prestocksDescArray = [];
 let partsArray = [];
 let partsDescArray = [];
 let volumeArray = [];
 let volumeDescArray = [];
+let tempLength = 0;
 
 // fill with database
 employees = ["PH", "SG", "KT", "CL"]
@@ -205,17 +206,39 @@ function syncScroll(scrolledCard) {
     });
 }
 
-function clickedEdit() {
+function createNew() {
     const arrays = {
+        prestocksArray: [],
         partsArray: [],
         partsDescArray: [],
         volumeArray: [],
         volumeDescArray: [],
-        prestocksArray: []
     };
-    if (!editMode) {
-        editMode = true;
-        document.getElementById("editBtn").innerHTML = "SAVE";
+    if (!createMode) {
+        createMode = true;
+
+        // clear dropdowns
+        let options = document.getElementById("workingStock");
+        for (let i = options.options.length - 1; i >= 0; i--) {
+            options.remove(i); // Clear existing options
+        }
+        let newOption = document.createElement("option");
+        options.options.add(newOption);
+
+        let infoCard;
+        for (let i = 0; i < materialsID.length; i++) {
+            infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+            const children = infoCard.children;
+            for (let i = children.length - 1; i >= 0; i--) {
+                if (!children[i].classList.contains('info-name') && !children[i].classList.contains('info-divider')) {
+                    infoCard.removeChild(children[i]);
+                }
+            }
+        }
+
+        addCardContent()
+
+        document.getElementById("createBtn").innerHTML = "SAVE NEW";
         document.querySelectorAll('.info-card').forEach(card => {
             card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
                 const input = document.createElement('input');
@@ -230,10 +253,40 @@ function clickedEdit() {
                 div.replaceWith(input);
             });
         });
+
+        const dropdownGroup = document.querySelector('.dropdown-group');
+        const selects = dropdownGroup.querySelectorAll('select');
+
+        selects.forEach(select => {
+            // Hide the original select
+            select.style.display = 'none';
+
+            // Create a container to hold the inputs
+            const inputContainer = document.createElement('div');
+            inputContainer.className = 'input-container';
+
+            // Create an input for each option
+            Array.from(select.options).forEach(option => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = option.text;
+                input.className = 'option-edit';
+                inputContainer.appendChild(input);
+            });
+
+            select.dataset.inputContainerId = `inputs-${select.id}`;
+            inputContainer.id = select.dataset.inputContainerId;
+            select.parentNode.appendChild(inputContainer);
+        });
     }
     else {
-        editMode = false;
-        document.getElementById("editBtn").innerHTML = "EDIT";
+        createMode = false;
+        document.getElementById("createBtn").innerHTML = "CREATE NEW";
+        for(let i = 0; i < materialsID.length; i++) {
+            infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+            const children = infoCard.children;
+            infoCard.removeChild(children[children.length - 1]);
+        }
         for (const key in arrays) {
             arrays[key] = [];
         }
@@ -255,9 +308,199 @@ function clickedEdit() {
                 input.replaceWith(newDiv);
             });
         });
-        console.log(arrays);
-        updatePreStocks(arrays.prestocksArray, arrays.partsArray, arrays.partsDescArray, arrays.volumeArray, arrays.volumeDescArray);
+        const dropdownGroup = document.querySelector('.dropdown-group');
+        const selects = dropdownGroup.querySelectorAll('select');
+
+        selects.forEach(select => {
+            const inputContainerId = select.dataset.inputContainerId;
+            const inputContainer = document.getElementById(inputContainerId);
+            const inputs = inputContainer.querySelectorAll('input');
+
+            // Clear current select options
+            select.innerHTML = '';
+
+            inputs.forEach(input => {
+                const option = document.createElement('option');
+                option.text = input.value;
+                select.add(option);
+            });
+
+            // Remove inputs and show select again
+            inputContainer.remove();
+            select.style.display = 'inline-block';
+        });
+        currentWS = document.getElementById("workingStock").value;
+        console.log(arrays)
+        // const docData = {
+        //     Parts: parts[i],
+        //     Volume: volumes[i],
+        //     PartsDesc: partsD[i],
+        //     VolumeDesc: volumesD[i],
+        // };
+        db.collection("WorkingStock")
+            .doc("NewExperiment")
+            .collection("workingStock")
+            .doc(currentWS) // or your dynamic variable `newPsBase`
+            .set({ createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+            .then(() => {
+                console.log("currentWS now exists with data");
+            });
+        for(let i = 0; i < arrays.prestocksArray.length; i++) {
+            let docRef = db.collection("WorkingStock")
+                .doc("NewExperiment")
+                .collection("workingStock")
+                .doc(currentWS) // or your dynamic variable `newPsBase`
+                .collection("PreStocks")
+                .doc(arrays.prestocksArray[i])
+
+            docRef.set({
+                Parts: arrays.partsArray[i],
+                PartsDesc: arrays.partsDescArray[i],
+                Volume: arrays.volumeArray[i],
+                VolumeDesc: arrays.volumeDescArray[i],
+            }).then(() => {
+                console.log("Data updated successfully!");
+            }).catch((error) => {
+                console.error("Error updating Data:", error);
+            });
+        }
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "New Template Created";
+        document.getElementById("modalTitle").style.color = "green"
+        document.getElementById("modalBody").textContent = "You can now use this template for future Pre-Stock entries.";
+        fetchAndFill(db.collection("WorkingStock").doc("NewExperiment").collection("workingStock"), false);
     }
+}
+
+function addCardContent() {
+    let infoCard;
+
+    for(let i = 0; i < materialsID.length; i++) {
+        infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+        const children = infoCard.children;
+        if (children[children.length - 1].classList.contains('action-button')) {
+            infoCard.removeChild(children[children.length - 1]);
+
+        }
+        const textDiv = document.createElement('div');
+        textDiv.className = 'info-text';
+        textDiv.textContent = "Add Content Here";
+
+        const descDiv = document.createElement('div');
+        descDiv.className = 'info-description';
+        descDiv.textContent = "Add Description Here";
+
+        infoCard.appendChild(textDiv);
+        infoCard.appendChild(descDiv);
+
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = div.textContent;
+                input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                input.style.border = "2px solid green";
+                input.style.fontSize = "15px";
+                input.style.gap = "4px";
+                const field = card.id;
+                input.setAttribute('data-card', field);
+                div.replaceWith(input);
+            });
+        });
+
+        const button = document.createElement('button');
+        button.className = 'action-button'; // Optional: style class
+        button.textContent = 'Add More Content';
+
+        button.onclick = addCardContent;
+
+        infoCard.appendChild(button);
+    }
+
+}
+
+function clickedEdit() {
+    const arrays = {
+        partsArray: [],
+        partsDescArray: [],
+        volumeArray: [],
+        volumeDescArray: [],
+        prestocksArray: []
+    };
+    if (currentWS !== "CHOOSE WORKING STOCK") {
+        if (!editMode) {
+            editMode = true;
+            document.getElementById("editBtn").innerHTML = "SAVE";
+            document.querySelectorAll('.info-card').forEach(card => {
+                card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = div.textContent;
+                    input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                    input.style.border = "2px solid green";
+                    input.style.fontSize = "15px";
+                    input.style.gap = "4px";
+                    const field = card.id;
+                    input.setAttribute('data-card', field);
+                    div.replaceWith(input);
+                    tempLength+= 0.5;
+                });
+            });
+            for(let i = 0; i < materialsID.length; i++) {
+                let tempCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+                const button = document.createElement('button');
+                button.className = 'action-button'; // Optional: style class
+                button.textContent = 'Add More Content';
+
+                button.onclick = addCardContent;
+
+                tempCard.appendChild(button);
+            }
+
+            console.log(tempLength / 3)
+        } else {
+            editMode = false;
+            document.getElementById("editBtn").innerHTML = "EDIT";
+            for (const key in arrays) {
+                arrays[key] = [];
+            }
+            document.querySelectorAll('.info-card').forEach(card => {
+                const cardId = card.id.toLowerCase().replace("card", "");
+
+                const inputs = card.querySelectorAll('input');
+                inputs.forEach((input, index) => {
+                    const isText = input.getAttribute('data-type') === 'text';
+                    const arrayName = cardId + (isText ? 'Array' : 'DescArray');
+
+                    if (arrays[arrayName]) {
+                        arrays[arrayName].push(input.value);
+                    }
+
+                    const newDiv = document.createElement('div');
+                    newDiv.className = isText ? 'info-text' : 'info-description';
+                    newDiv.textContent = input.value;
+                    input.replaceWith(newDiv);
+                });
+            });
+            console.log(arrays);
+            for(let i = 0; i < materialsID.length; i++) {
+                infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+                const children = infoCard.children;
+                infoCard.removeChild(children[children.length - 1]);
+            }
+            updatePreStocks(arrays.prestocksArray, arrays.partsArray, arrays.partsDescArray, arrays.volumeArray, arrays.volumeDescArray);
+        }
+    }
+    else {
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error";
+        document.getElementById("modalTitle").style.color = "red";
+        document.getElementById("modalBody").textContent = "Please select a Working Stock to edit.";
+    }
+}
+
+function closeModal() {
+    document.getElementById("successModal").style.display = "none";
 }
 
 async function updatePreStocks(names, parts, partsD ,volumes, volumesD) {
