@@ -152,7 +152,7 @@ function selectedOption(idName) {
     if (document.getElementById(idName).selectedIndex === 0) {
         document.getElementById("workingStockC").style.border = "3px double red";
         document.getElementById("workingStockC").style.padding = "5px";
-        currentWS = "CHOOSE WORKING STOCK";
+        currentWS = "Choose First";
         fillBatchNumber(currentWS);
     }
     else {

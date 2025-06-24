@@ -28,7 +28,7 @@
             </label>
             <label id="volumeC">
                 Volume (mL)
-                <select id="volume">
+                <select id="volume" onchange="calculate()">
                     <option>1</option>
                     <option>5</option>
                     <option>15</option>
@@ -41,7 +41,7 @@
                 </select>
             </label>
             <label id="bufferxC">Buffer X
-                <select id="bufferx" onchange="selectedOption('bufferx')">
+                <select id="bufferx" onchange="calculate()">
                     <option>0.5</option>
                     <option>1</option>
                     <option>2.5</option>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>PCR</title>
+    <link rel="stylesheet" href="PCR.css" />
+
+
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo"></div>
+        <div class="nav-buttons">
+        <button>Inventory</button>
+        <button>Report Bug / Suggestion</button>
+        <button id="createBtn" class="user" onclick="createNew()" >CREATE NEW</button>
+        <button id="editBtn" onclick="clickedEdit()" class="edit">EDIT</button>
+        </div>
+    </div>
+    <main>
+        <div class="top-row">
+            <div class="dropdown-group">
+                <label id="ProjectNameC" >
+                    Working Stock
+                    <select id="ProjectName" onchange="selectedOption('ProjectName')">
+                        <option>Choose First</option>
+                        <option>First</option>
+                    </select>
+                </label>
+
+                <label>
+                    Item
+                    <input type="text" value="" />
+                </label>
+
+                <label>
+                    # of Tubes
+                    <input type="text" value="" />
+                </label>
+            </div>
+
+        </div>
+        <div class="batch-field">
+        <label>Batch #
+            <input id="batchNumber" type="text">
+        </label>
+        </div>
+
+        <div class="info-columns">
+            <div class="info-card" onscroll="syncScroll(this)" id="ReagantsCard">
+                <div class="info-name">Reagants</div>
+                <div class="info-divider"></div>
+                <div class="info-text">VB - pRP[Exp]-CMV+intron>EGFP(ns):P2A:Luciferase (100ng/uL)</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">Top Core MODIFIED </div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">Top Arm OH Replacements</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">Bottom Arm OH Replacements</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">Standards</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">Standard 110</div>
+                <div class="info-description">Batch info</div>
+            </div>
+            <div class="info-card" onscroll="syncScroll(this)" id="SingleReactionVolCard">
+                <div class="info-name">Reaction Volume</div>
+                <div class="info-divider"></div>
+                <div class="info-text">0</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0 </div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0 </div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0 </div>
+                <div class="info-description">Batch info</div>
+            </div>
+            <div class="info-card" onscroll="syncScroll(this)" id="VolumeCard">
+                <div class="info-name">Volume</div>
+                <div class="info-divider"></div>
+                <div class="info-text">0</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0 </div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0 </div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0 </div>
+                <div class="info-description">Batch info</div>
+            </div>
+            <div class="info-card" onscroll="syncScroll(this)" id="AddedCard">
+                <div class="info-name">Amount Added </div>
+                <div class="info-divider"></div>
+                <div class="info-text">0</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0 </div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0 </div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0</div>
+                <div class="info-description">Batch info</div>
+                <div class="info-text">0 </div>
+                <div class="info-description">Batch info</div>
+            </div>
+            <div class="form-card">
+                <label>
+                    # of Cycles
+                    <input type="text" value="" />
+                </label>
+                <button class="protocol">Thermocycler Protocol</button>
+                <label>Assigned To</label>
+                <div class="tags">
+                    <span id="employeeBtn0" onclick="employeeClicked(0)" class="tag">PH</span>
+                    <span id="employeeBtn1" onclick="employeeClicked(1)" class="tag">SG</span>
+                    <span id="employeeBtn2" onclick="employeeClicked(2)" class="tag">KT</span>
+                    <span id="employeeBtn3" onclick="employeeClicked(3)" class="tag">CL</span>
+                </div>
+            </div>
+        </div>
+        <div class="notes-section">
+            <label>Notes</label>
+            <textarea id = "notes"></textarea>
+        </div>
+        <div class="bottom-actions">
+            <button class="procedure">📄 Procedure</button>
+            <button class="upload" onclick="upload()" >⤴ Upload</button>
+        </div>
+    </main>
+    <div id="back-button-container" onclick="location.href='../../index.html'">
+        <button id="back-button">← Back</button>
+    </div>
+
+    <div class="custom-modal" id="successModal">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitle">Text Heading</div>
+            <button class="close-button" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody">Body text</div>
+        <div class="modal-footer">
+            <button class="filled-btn" onclick="closeModal()">Ok</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore-compat.js"></script>
+    <script src="../../firebaseConfig.js"></script>
+    <script src="PCR.js"></script>
+
+</body>
+</html>
