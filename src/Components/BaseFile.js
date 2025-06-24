@@ -184,5 +184,90 @@ function employeeClicked(index) {
         employeeCheck[index] = true;
         employeeUsed.push(employees[index]);
     }
-    fillBatchNumber(currentWS);
+    fillBatchNumber(currentX);
+}
+
+async function updateDB(ingredient, ingredientD, weight ,weightD, concentration, concentrationD) {
+    const mainRef = db
+        .collection("X")
+        .doc("NewExperiment")
+        .collection("X")
+        .doc(X)
+        .collection("X");
+
+    const snapshot = await mainRef.get();
+    const deletePromises = [];
+    snapshot.forEach(doc => {
+        deletePromises.push(mainRef.doc(doc.id).delete());
+    });
+    await Promise.all(deletePromises);
+    console.log("All existing X documents deleted.");
+
+    const addPromises = [];
+    for (let i = 0; i < X.length; i++) {
+        const docData = {
+            X: X[i],
+            X: X[i],
+            X: X[i],
+            X: X[i],
+            X: X[i],
+        };
+        console.log(docData);
+        addPromises.push(mainRef.doc(X[i]).set(docData));
+    }
+    await Promise.all(addPromises);
+    console.log("New Buffer documents added.");
+    document.getElementById("successModal").style.display = "block";
+    document.getElementById("modalTitle").textContent = "Edit saved successfully to the Database";
+    document.getElementById("modalTitle").style.color = "green"
+    document.getElementById("modalBody").textContent = "This change will now be reflected in this X template.";
+}
+
+function addCardContent() {
+    for(let i = 0; i < materialsID.length; i++) {
+        infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+        const children = infoCard.children;
+        if (children[children.length - 1].classList.contains('action-button')) {
+            infoCard.removeChild(children[children.length - 1]);
+
+        }
+        const textDiv = document.createElement('div');
+        textDiv.className = 'info-text';
+        textDiv.textContent = "Add Content Here";
+
+        const descDiv = document.createElement('div');
+        descDiv.className = 'info-description';
+        descDiv.textContent = "Add Description Here";
+
+        infoCard.appendChild(textDiv);
+        infoCard.appendChild(descDiv);
+
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = div.textContent;
+                input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                input.style.border = "2px solid green";
+                input.style.fontSize = "15px";
+                input.style.gap = "4px";
+                const field = card.id;
+                input.setAttribute('data-card', field);
+                div.replaceWith(input);
+            });
+        });
+
+        const button = document.createElement('button');
+        button.className = 'action-button'; // Optional: style class
+        button.textContent = 'Add More Content';
+
+        button.onclick = addCardContent;
+
+        infoCard.appendChild(button);
+    }
+
+}
+
+function closeModal() {
+    document.getElementById("successModal").style.display = "none";
 }

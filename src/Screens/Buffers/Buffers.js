@@ -33,7 +33,7 @@ function selectedOption(idName) {
     if (document.getElementById(idName).selectedIndex === 0) {
         document.getElementById("bufferC").style.border = "3px double red";
         document.getElementById("bufferC").style.padding = "5px";
-        currentWS = "Choose First";
+        currentBuffer = "Choose First";
         fillBatchNumber(currentBuffer);
     }
     else {
@@ -210,7 +210,7 @@ function calculate() {
 }
 
 function fillBatchNumber(Value) {
-    // do you not put what prestock you used?
+    // how does this work for buffer
     const d = new Date();
     let month = d.getMonth() + 1;
     let day = d.getDate();
@@ -243,4 +243,334 @@ function employeeClicked(index) {
         employeeUsed.push(employees[index]);
     }
     fillBatchNumber(currentBuffer);
+}
+
+function createNew() {
+    const arrays = {
+        ingredientsArray: [],
+        ingredientsDescArray: [],
+        weightArray: [],
+        weightDescArray: [],
+        concentrationArray: [],
+        concentrationDescArray: [],
+    };
+    if (!createMode) {
+        createMode = true;
+
+        // clear dropdowns
+        let options = document.getElementById("buffer");
+        for (let i = options.options.length - 1; i >= 0; i--) {
+            options.remove(i); // Clear existing options
+        }
+        let newOption = document.createElement("option");
+        options.options.add(newOption);
+
+        let infoCard;
+        for (let i = 0; i < materialsID.length - 1; i++) {
+            infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+            const children = infoCard.children;
+            for (let i = children.length - 1; i >= 0; i--) {
+                if (!children[i].classList.contains('info-name') && !children[i].classList.contains('info-divider')) {
+                    infoCard.removeChild(children[i]);
+                }
+            }
+        }
+
+        addCardContent()
+
+        document.getElementById("createBtn").innerHTML = "SAVE NEW";
+        document.querySelectorAll('.info-card').forEach(card => {
+            if (card.id !== "MassCard") {
+                card.querySelectorAll('.info-text, .info-description').forEach((div) => {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = div.textContent;
+                    input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                    input.style.border = "2px solid green";
+                    input.style.fontSize = "15px";
+                    input.style.gap = "4px";
+                    input.setAttribute('data-card', card.id);
+                    div.replaceWith(input);
+                });
+            }
+        });
+
+
+        const dropdownGroup = document.querySelector('.dropdown-group');
+        const selects = dropdownGroup.querySelectorAll('select');
+
+        selects.forEach(select => {
+            if (select.id === "buffer") {
+                select.style.display = 'none';
+                const inputContainer = document.createElement('div');
+                inputContainer.className = 'input-container';
+
+                Array.from(select.options).forEach(option => {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = option.text;
+                    input.className = 'option-edit';
+                    inputContainer.appendChild(input);
+                });
+                select.dataset.inputContainerId = `inputs-${select.id}`;
+                inputContainer.id = select.dataset.inputContainerId;
+                select.parentNode.appendChild(inputContainer);
+            }
+        });
+    }
+    else {
+        createMode = false;
+        document.getElementById("createBtn").innerHTML = "CREATE NEW";
+        for(let i = 0; i < materialsID.length - 1; i++) {
+            infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+            const children = infoCard.children;
+            infoCard.removeChild(children[children.length - 1]);
+        }
+        for (const key in arrays) {
+            arrays[key] = [];
+        }
+        document.querySelectorAll('.info-card').forEach(card => {
+            if (card.id !== "MassCard") {
+                const cardId = card.id.toLowerCase().replace("card", "");
+                const inputs = card.querySelectorAll('input');
+                inputs.forEach((input, index) => {
+                    const isText = input.getAttribute('data-type') === 'text';
+                    const arrayName = cardId + (isText ? 'Array' : 'DescArray');
+
+                    if (arrays[arrayName]) {
+                        arrays[arrayName].push(input.value);
+                    }
+
+                    const newDiv = document.createElement('div');
+                    newDiv.className = isText ? 'info-text' : 'info-description';
+                    newDiv.textContent = input.value;
+                    input.replaceWith(newDiv);
+                });
+            }
+        });
+        const dropdownGroup = document.querySelector('.dropdown-group');
+        const selects = dropdownGroup.querySelectorAll('select');
+
+        selects.forEach(select => {
+            if (select.id === "buffer") {
+                const inputContainerId = select.dataset.inputContainerId;
+                const inputContainer = document.getElementById(inputContainerId);
+                const inputs = inputContainer.querySelectorAll('input');
+                select.innerHTML = '';
+
+                inputs.forEach(input => {
+                    const option = document.createElement('option');
+                    option.text = input.value;
+                    select.add(option);
+                });
+                inputContainer.remove();
+                select.style.display = 'inline-block';
+            }
+        });
+        currentBuffer = document.getElementById("buffer").value;
+        console.log(arrays)
+        db.collection("Buffer")
+            .doc("NewExperiment")
+            .collection("Buffer")
+            .doc(currentBuffer)
+            .set({ createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+            .then(() => {
+                console.log("current doc now initialized");
+            });
+        for(let i = 0; i < arrays.ingredientsArray.length; i++) {
+            let docRef = db.collection("Buffer")
+                .doc("NewExperiment")
+                .collection("Buffer")
+                .doc(currentBuffer)
+                .collection("Ingredients")
+                .doc(arrays.ingredientsArray[i])
+
+            docRef.set({
+                Batch: arrays.ingredientsDescArray[i],
+                Concentration: arrays.concentrationArray[i],
+                ConcentrationDesc: arrays.concentrationDescArray[i],
+                Weight: arrays.weightArray[i],
+                WeightDesc: arrays.weightDescArray[i],
+            }).then(() => {
+                console.log("Data updated successfully!");
+            }).catch((error) => {
+                console.error("Error updating Data:", error);
+            });
+        }
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "New Template Created";
+        document.getElementById("modalTitle").style.color = "green"
+        document.getElementById("modalBody").textContent = "You can now use this template for future Buffer entries.";
+        fetchAndFill(db.collection("Buffer").doc("NewExperiment").collection("Buffer"), false);
+        calculate()
+    }
+}
+
+function clickedEdit() {
+    const arrays = {
+        ingredientsArray: [],
+        ingredientsDescArray: [],
+        weightArray: [],
+        weightDescArray: [],
+        concentrationArray: [],
+        concentrationDescArray: [],
+    };
+    if (currentBuffer !== "Choose First") {
+        if (!editMode) {
+            editMode = true;
+            document.getElementById("editBtn").innerHTML = "SAVE";
+
+            document.querySelectorAll('.info-card').forEach(card => {
+                if (card.id !== "MassCard") {
+                    card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = div.textContent;
+                        input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                        input.style.border = "2px solid green";
+                        input.style.fontSize = "15px";
+                        input.style.gap = "4px";
+                        const field = card.id;
+                        input.setAttribute('data-card', field);
+                        div.replaceWith(input);
+                    });
+                }
+            });
+            // i couldve just done materialsID.length - 1    :/
+            // (i just realized)
+            for (let i = 0; i < materialsID.length; i++) {
+                const tempCard = document.getElementById(`${materialsID[i]}Card`);
+                if (tempCard.id !== "MassCard") {
+                    const button = document.createElement('button');
+                    button.className = 'action-button';
+                    button.textContent = 'Add More Content';
+                    button.onclick = addCardContent;
+                    tempCard.appendChild(button);
+                }
+            }
+        }
+        else {
+            editMode = false;
+            document.getElementById("editBtn").innerHTML = "EDIT";
+            for (const key in arrays) {
+                arrays[key] = [];
+            }
+            document.querySelectorAll('.info-card').forEach(card => {
+                if (card.id !== "MassCard") {
+                    const cardId = card.id.toLowerCase().replace("card", "");
+                    const inputs = card.querySelectorAll('input');
+                    inputs.forEach((input) => {
+                        const isText = input.getAttribute('data-type') === 'text';
+                        const arrayName = cardId + (isText ? 'Array' : 'DescArray');
+
+                        if (arrays[arrayName]) {
+                            arrays[arrayName].push(input.value);
+                        }
+
+                        const newDiv = document.createElement('div');
+                        newDiv.className = isText ? 'info-text' : 'info-description';
+                        newDiv.textContent = input.value;
+                        input.replaceWith(newDiv);
+                    });
+                }
+            });
+            console.log(arrays);
+
+            for (let i = 0; i < materialsID.length; i++) {
+                const infoCard = document.getElementById(`${materialsID[i]}Card`);
+                if (infoCard.id !== "MassCard") {
+                    const children = infoCard.children;
+                    infoCard.removeChild(children[children.length - 1]);
+                }
+            }
+            updateDB(arrays.ingredientsArray, arrays.ingredientsDescArray, arrays.weightArray, arrays.weightDescArray, arrays.concentrationArray, arrays.concentrationDescArray);
+        }
+    }
+    else {
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error";
+        document.getElementById("modalTitle").style.color = "red";
+        document.getElementById("modalBody").textContent = "Please select a Buffer to edit.";
+    }
+}
+
+async function updateDB(ingredient, ingredientD, weight ,weightD, concentration, concentrationD) {
+    const mainRef = db
+        .collection("Buffer")
+        .doc("NewExperiment")
+        .collection("Buffer")
+        .doc(currentBuffer)
+        .collection("Ingredients");
+
+    const snapshot = await mainRef.get();
+    const deletePromises = [];
+    snapshot.forEach(doc => {
+        deletePromises.push(mainRef.doc(doc.id).delete());
+    });
+    await Promise.all(deletePromises);
+    console.log("All existing Buffer documents deleted.");
+
+    const addPromises = [];
+    for (let i = 0; i < ingredient.length; i++) {
+        const docData = {
+            Batch: ingredientD[i],
+            Concentration: concentration[i],
+            ConcentrationDesc: concentrationD[i],
+            Weight: weight[i],
+            WeightDesc: weightD[i],
+        };
+        console.log(docData);
+        addPromises.push(mainRef.doc(ingredient[i]).set(docData));
+    }
+    await Promise.all(addPromises);
+    console.log("New Buffer documents added.");
+    document.getElementById("successModal").style.display = "block";
+    document.getElementById("modalTitle").textContent = "Edit saved successfully to the Database";
+    document.getElementById("modalTitle").style.color = "green"
+    document.getElementById("modalBody").textContent = "This change will now be reflected in this Buffer template.";
+    calculate();
+}
+
+function addCardContent() {
+    for (let i = 0; i < materialsID.length; i++) {
+        const cardId = `${materialsID[i]}Card`;
+        if (cardId !== "MassCard") {
+            const infoCard = document.getElementById(cardId);
+            const children = infoCard.children;
+            if (children[children.length - 1]?.classList.contains('action-button')) {
+                infoCard.removeChild(children[children.length - 1]);
+            }
+
+            const textDiv = document.createElement('div');
+            textDiv.className = 'info-text';
+            textDiv.textContent = "Add Content Here";
+            const descDiv = document.createElement('div');
+            descDiv.className = 'info-description';
+            descDiv.textContent = "Add Description Here";
+
+            infoCard.appendChild(textDiv);
+            infoCard.appendChild(descDiv);
+            infoCard.querySelectorAll('.info-text, .info-description').forEach((div) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = div.textContent;
+                input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                input.style.border = "2px solid green";
+                input.style.fontSize = "15px";
+                input.style.gap = "4px";
+                input.setAttribute('data-card', cardId);
+                div.replaceWith(input);
+            });
+
+            const button = document.createElement('button');
+            button.className = 'action-button';
+            button.textContent = 'Add More Content';
+            button.onclick = addCardContent;
+            infoCard.appendChild(button);
+        }
+    }
+}
+
+function closeModal() {
+    document.getElementById("successModal").style.display = "none";
 }

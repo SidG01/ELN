@@ -367,7 +367,7 @@ function createNew() {
         document.getElementById("successModal").style.display = "block";
         document.getElementById("modalTitle").textContent = "New Template Created";
         document.getElementById("modalTitle").style.color = "green"
-        document.getElementById("modalBody").textContent = "You can now use this template for future Pre-Stock entries.";
+        document.getElementById("modalBody").textContent = "You can now use this template for future Working Stock entries.";
         fetchAndFill(db.collection("WorkingStock").doc("NewExperiment").collection("workingStock"), false);
     }
 }
