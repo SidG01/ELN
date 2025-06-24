@@ -4,23 +4,167 @@
     <meta charset="UTF-8" />
     <title>Buffers</title>
     <link rel="stylesheet" href="Buffers.css" />
-
-
 </head>
 <body>
-    <div id="header"></div>
+<div class="topbar">
+    <div class="logo"></div>
+    <div class="nav-buttons">
+        <button>Inventory</button>
+        <button>Report Bug / Suggestion</button>
+        <button id="createBtn" class="user" onclick="createNew()" >CREATE NEW</button>
+        <button id="editBtn" onclick="clickedEdit()" class="edit">EDIT</button>
+    </div>
+</div>
 
-    <div class="card-grid">
-    <div class="card">
-        <strong>Buffers</strong><br>
-        Created on 6/2/2025<br>
-        Description: Inventory data for v2_5 stock version.
-    </div>
-    </div>
-    <div id="back-button-container" onclick="location.href='../../index.html'">
-        <button id="back-button">← Back</button>
+<main>
+    <div class="top-row">
+        <div class="dropdown-group">
+            <label id="bufferC" >
+                Buffer Name
+                <select id="buffer" onchange="selectedOption('buffer')">
+                    <option>Choose First</option>
+                    <option>FOB</option>
+                </select>
+            </label>
+            <label id="volumeC">
+                Volume (mL)
+                <select id="volume">
+                    <option>1</option>
+                    <option>5</option>
+                    <option>15</option>
+                    <option>50</option>
+                    <option>100</option>
+                    <option>250</option>
+                    <option>500</option>
+                    <option>1000</option>
+                    <option>5000</option>
+                </select>
+            </label>
+            <label id="bufferxC">Buffer X
+                <select id="bufferx" onchange="selectedOption('bufferx')">
+                    <option>0.5</option>
+                    <option>1</option>
+                    <option>2.5</option>
+                    <option>5</option>
+                    <option>10</option>
+                </select>
+            </label>
+
+        </div>
     </div>
 
+    <div class="batch-field">
+        <label>Batch #
+            <input id="batchNumber" type="text">
+        </label>
+    </div>
+
+    <div class="info-columns">
+        <div class="info-card" id="IngredientsCard">
+            <div class="info-name">Ingredients</div>
+            <div class="info-divider"></div>
+            <div class="info-text">EDTA</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Tris</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Tris</div>
+            <div class="info-description">Batch info</div>
+        </div>
+        <div class="info-card" id="WeightCard">
+            <div class="info-name">Molecular Weight</div>
+            <div class="info-divider"></div>
+            <div class="info-text">EDTA</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Tris</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Tris</div>
+            <div class="info-description">Batch info</div>
+        </div>
+        <div class="info-card" id="ConcentrationCard">
+            <div class="info-name">Concentration (mM)</div>
+            <div class="info-divider"></div>
+            <div class="info-text">EDTA</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Tris</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Tris</div>
+            <div class="info-description">Batch info</div>
+        </div>
+        <div class="info-card" id="MassCard">
+            <div class="info-name">Mass (g) to Add</div>
+            <div class="info-divider"></div>
+            <div class="info-text">EDTA</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Tris</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Tris</div>
+            <div class="info-description">Batch info</div>
+        </div>
+        <div class="checkboxes">
+            <label>
+                <input type="checkbox" id="SbottleCheck">
+                <div>
+                    Use Sterile Bottle
+                    <span>Description</span>
+                </div>
+            </label>
+            <label>
+                <input type="checkbox" id="SstirbarCheck">
+                <div>
+                    Use Sterile Stirbar
+                    <span>Description</span>
+                </div>
+            </label>
+            <label>
+                <input type="checkbox" id="filterCheck">
+                <div>
+                    Filter Buffer
+                    <span>Description</span>
+                </div>
+            </label>
+            <div class="form-card">
+                <label>Assigned To</label>
+                <div class="tags">
+                    <span id="employeeBtn0" onclick="employeeClicked(0)" class="tag">PH</span>
+                    <span id="employeeBtn1" onclick="employeeClicked(1)" class="tag">SG</span>
+                    <span id="employeeBtn2" onclick="employeeClicked(2)" class="tag">KT</span>
+                    <span id="employeeBtn3" onclick="employeeClicked(3)" class="tag">CL</span>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="notes-section">
+        <label>Notes</label>
+        <textarea id = "notes"></textarea>
+    </div>
+    <div class="bottom-actions">
+        <button class="procedure">📄 Procedure</button>
+        <button class="upload" onclick="upload()" >⤴ Upload</button>
+    </div>
+</main>
+
+<div id="back-button-container" onclick="location.href='../../index.html'">
+    <button onclick="window.history.back()" id="back-button">← Back</button>
+</div>
+<div class="custom-modal" id="successModal">
+    <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Text Heading</div>
+        <button class="close-button" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody">Body text</div>
+    <div class="modal-footer">
+        <button class="filled-btn" onclick="closeModal()">Ok</button>
+    </div>
+</div>
+
+
+
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore-compat.js"></script>
+<script src="../../firebaseConfig.js"></script>
     <script src="Buffers.js"></script>
 
 </body>

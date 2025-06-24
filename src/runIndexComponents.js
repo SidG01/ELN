@@ -21,12 +21,13 @@
 
 loadCard('Pre-Stock', 'hGL_v2_5', '5/15/2025', 'PreStockButton');
 loadCard('Working Stock', 'hGL_4x4x4_F4', '6/2/2025', 'WorkingStockButton');
+loadCard('PCR', 'hGL_v2_5', '6/2/2025', 'PcrButton');
 loadCard('Antibody Conjugation', 'hGL_v2_5', '6/2/2025', 'AntibodyConjugationButton');
 loadCard('Buffers', 'hGL_v2_5', '6/2/2025', 'BuffersButton');
 loadCard('Conjugation', 'hGL_v2_5', '6/2/2025', 'ConjugationButton');
 loadCard('Cryopreservation', 'hGL_v2_5', '6/2/2025', 'CryopreservationButton');
 loadCard('Folding', 'hGL_v2_5', '6/2/2025', 'FoldingButton');
-loadCard('Gels', 'hGL_v2_5', '6/2/2025', 'GelsButton');
+loadCard('AGE Gels', 'hGL_v2_5', '6/2/2025', 'GelsButton');
 loadCard('Generic', 'hGL_v2_5', '6/2/2025', 'GenericButton');
 loadCard('PEG', 'hGL_v2_5', '6/2/2025', 'PEGButton');
 loadCard('Protein Conjugation', 'hGL_v2_5', '6/2/2025', 'ProteinConjugationButton');
@@ -41,6 +42,9 @@ function preStockPage() {
 }
 function workingStockPage() {
     location.assign("Screens/WorkingStock/WorkingStock.html");
+}
+function pcrPage() {
+    location.assign("Screens/PCR/PCR.html");
 }
 function antiBodyCPage() {
     location.assign("Screens/AntibodyConjugation/AntibodyConjugation.html");

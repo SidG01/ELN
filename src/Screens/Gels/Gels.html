@@ -2,25 +2,38 @@
 <html>
 <head>
     <meta charset="UTF-8" />
-    <title>Gels</title>
+    <title>AGE Gels</title>
     <link rel="stylesheet" href="Gels.css" />
-
-
 </head>
 <body>
-    <div id="header"></div>
+    <div class="topbar">
+        <div class="logo"></div>
+        <div class="nav-buttons">
+            <button>Inventory</button>
+            <button>Report Bug / Suggestion</button>
+            <button id="createBtn" class="user" onclick="createNew()" >CREATE NEW</button>
+            <button id="editBtn" onclick="clickedEdit()" class="edit">EDIT</button>
+        </div>
+    </div>
 
-    <div class="card-grid">
-    <div class="card">
-        <strong>Gels</strong><br>
-        Created on 6/2/2025<br>
-        Description: Inventory data for v2_5 stock version.
-    </div>
-    </div>
+
     <div id="back-button-container" onclick="location.href='../../index.html'">
         <button id="back-button">← Back</button>
     </div>
 
+    <div class="custom-modal" id="successModal">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitle">Text Heading</div>
+            <button class="close-button" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody">Body text</div>
+        <div class="modal-footer">
+            <button class="filled-btn" onclick="closeModal()">Ok</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore-compat.js"></script>
     <script src="Gels.js"></script>
 
 </body>

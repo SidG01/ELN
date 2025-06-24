@@ -8,19 +8,163 @@
 
 </head>
 <body>
-    <div id="header"></div>
+<div class="topbar">
+    <div class="logo"></div>
+    <div class="nav-buttons">
+        <button>Inventory</button>
+        <button>Report Bug / Suggestion</button>
+        <button id="createBtn" class="user" onclick="createNew()" >CREATE NEW</button>
+        <button id="editBtn" onclick="clickedEdit()" class="edit">EDIT</button>
+    </div>
+</div>
 
-    <div class="card-grid">
-    <div class="card">
-        <strong>Folding</strong><br>
-        Created on 6/2/2025<br>
-        Description: Inventory data for v2_5 stock version.
+<main>
+    <div class="top-row">
+        <div class="dropdown-group">
+            <label id="StructureC" >
+                Buffer Name
+                <select id="Structure" onchange="selectedOption('Structure')">
+                    <option>A2H4</option>
+                    <option>DOVAC66</option>
+                </select>
+            </label>
+            <label>
+                Volume (uL)
+                <input type="text" value="" />
+            </label>
+            <label>
+                Working Stock Parts
+                <input type="text" value="" />
+            </label>
+        </div>
     </div>
+    <div class="batch-field">
+        <label>Batch #
+            <input id="batchNumber" type="text">
+        </label>
     </div>
-    <div id="back-button-container" onclick="location.href='../../index.html'">
-        <button id="back-button">← Back</button>
-    </div>
+    <div class="info-columns">
+        <div class="info-card" onscroll="syncScroll(this)" id="IngredientsCard">
+            <div class="info-name">Ingredients</div>
+            <div class="info-divider"></div>
+            <div class="info-text">VB -</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Top Core MODIFIED </div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Top Arm OH Replacements</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Bottom Arm OH Replacements</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Standards</div>
+            <div class="info-description">Batch info</div>
+        </div>
 
+        <div class="info-card" onscroll="syncScroll(this)" id="ConcentrationCard">
+            <div class="info-name">Concentration</div>
+            <div class="info-divider"></div>
+            <div class="info-text">VB -</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Top Core MODIFIED </div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Top Arm </div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Bottom Arm </div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Standards</div>
+            <div class="info-description">Batch info</div>
+        </div>
+
+        <div class="info-card" onscroll="syncScroll(this)" id="PercentageCard">
+            <div class="info-name">Percentage</div>
+            <div class="info-divider"></div>
+            <div class="info-text">VB -</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Top Core MODIFIED </div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Top Arm </div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Bottom </div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Standards</div>
+            <div class="info-description">Batch info</div>
+        </div>
+
+        <div class="info-card" onscroll="syncScroll(this)" id="VolumeCard">
+            <div class="info-name">Volume (uL) to Add</div>
+            <div class="info-divider"></div>
+            <div class="info-text">VB -</div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Top Core MODIFIED </div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Top Arm </div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Bottom </div>
+            <div class="info-description">Batch info</div>
+            <div class="info-text">Standards</div>
+            <div class="info-description">Batch info</div>
+        </div>
+        <div class="checkboxes">
+            <label>
+                <input type="checkbox" id="mixCheck">
+                <div>
+                    Mix Items
+                    <span>Description</span>
+                </div>
+            </label>
+            <label>
+                <input type="checkbox" id="thermalRampCheck">
+                <div>
+                    Thermal Ramp
+                    <span>Description</span>
+                </div>
+            </label>
+            <label>
+                <input type="checkbox" id="filterCheck">
+                <div>
+                    Filter Buffer
+                    <span>Description</span>
+                </div>
+            </label>
+            <div class="form-card">
+                <label>Assigned To</label>
+                <div class="tags">
+                    <span id="employeeBtn0" onclick="employeeClicked(0)" class="tag">PH</span>
+                    <span id="employeeBtn1" onclick="employeeClicked(1)" class="tag">SG</span>
+                    <span id="employeeBtn2" onclick="employeeClicked(2)" class="tag">KT</span>
+                    <span id="employeeBtn3" onclick="employeeClicked(3)" class="tag">CL</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="notes-section">
+        <label>Notes</label>
+        <textarea id = "notes"></textarea>
+    </div>
+    <div class="bottom-actions">
+        <button class="procedure">📄 Procedure</button>
+        <button class="upload" onclick="upload()" >⤴ Upload</button>
+    </div>
+</main>
+
+<div id="back-button-container" onclick="location.href='../../index.html'">
+    <button onclick="window.history.back()" id="back-button">← Back</button>
+</div>
+<div class="custom-modal" id="successModal">
+    <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Text Heading</div>
+        <button class="close-button" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody">Body text</div>
+    <div class="modal-footer">
+        <button class="filled-btn" onclick="closeModal()">Ok</button>
+    </div>
+</div>
+
+
+
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore-compat.js"></script>
+    <script src="../../firebaseConfig.js"></script>
     <script src="Folding.js"></script>
 
 </body>
