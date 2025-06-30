@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Cryo</title>
+    <link rel="stylesheet" href="SearchOutput.css" />
+
+
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo"></div>
+        <div class="nav-buttons">
+            <button>Inventory</button>
+            <button>Report Bug / Suggestion</button>
+        </div>
+    </div>
+    <main>
+        <div class="month-nav">
+            <button class="month-btn">&#x276E;</button>
+            <h1 class="faq-heading">June</h1>
+            <button class="month-btn">&#x276F;</button>
+        </div>
+        <p class="faq-subheading">All Contents In June of 2025</p>
+        <div class="dropdown-group">
+            <label>
+                Experiment
+                <select id="experiment" onchange="selectedOption('experiment', 0)">
+                    <option>N / A</option>
+                    <option>Pre Stocks</option>
+                </select>
+            </label>
+            <label>
+                Specifics
+                <select id="specifics" onchange="selectedOption('specifics',1)">
+                    <option>N / A</option>
+                    <option>Biosensor</option>
+                </select>
+            </label>
+            <label>
+                Employee
+                <select id="employee" onchange="selectedOption('employee',2)">
+                    <option>N / A</option>
+                    <option>PH</option>
+                </select>
+            </label>
+            <label>
+                Date
+                <input type="date" id="date" onchange="selectedOption('date',3)"/>
+            </label>
+        </div>
+        <div class="faq-container">
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-title">Title</div>
+                    <div class="accordion-content">
+                        Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-title">Title</div>
+                    <div class="accordion-content">
+                        Example answer content here.
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-title">Title</div>
+                    <div class="accordion-content">
+                        Example answer content here.
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-title">Title</div>
+                    <div class="accordion-content">
+                        Example answer content here.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+
+        </script>
+    </main>
+
+    <div id="back-button-container" onclick="location.href='../SearchDashboard/SearchDashboard.html'">
+        <button id="back-button">← Back</button>
+    </div>
+    <div class="custom-modal" id="successModal">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitle">Text Heading</div>
+            <button class="close-button" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody">Body text</div>
+        <div class="modal-footer">
+            <button class="filled-btn" onclick="closeModal()">Ok</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore-compat.js"></script>
+    <script src="../../../firebaseConfig.js"></script>
+    <script src="SearchOutput.js"></script>
+
+</body>
+</html>

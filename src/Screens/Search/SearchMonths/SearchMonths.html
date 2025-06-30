@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Scaffold</title>
+    <link rel="stylesheet" href="SearchMonths.css" />
+
+
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo"></div>
+        <div class="nav-buttons">
+            <button>Inventory</button>
+            <button>Report Bug / Suggestion</button>
+        </div>
+    </div>
+    <h2 class="search-title" id="selectedYEAR"></h2>
+    <div class="month-grid">
+        <div class="month-card" onclick="selectedCard(1)">
+            <div class="icon" id="icon1"> &#x2716;</div>
+            <div class="title" id="month1">January</div>
+            <div class="text" id="body1">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(2)">
+            <div class="icon" id="icon2">&#x2714;</div>
+            <div class="title" id="month2">February</div>
+            <div class="text" id="body2">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(3)">
+            <div class="icon" id="icon3">&#x2714;</div>
+            <div class="title" id="month3">March</div>
+            <div class="text" id="body3">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(4)">
+            <div class="icon" id="icon4">&#x2714;</div>
+            <div class="title" id="month4">April</div>
+            <div class="text" id="body4">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(5)">
+            <div class="icon" id="icon5">&#x2716;</div>
+            <div class="title" id="month5">May</div>
+            <div class="text" id="body5">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(6)">
+            <div class="icon" id="icon6">&#x2714;</div>
+            <div class="title" id="month6">June</div>
+            <div class="text" id="body6">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(7)">
+            <div class="icon" id="icon7">&#x2714;</div>
+            <div class="title" id="month7">July</div>
+            <div class="text" id="body7">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(8)">
+            <div class="icon" id="icon8">&#x2714;</div>
+            <div class="title" id="month8">August</div>
+            <div class="text" id="body8">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(9)">
+            <div class="icon" id="icon9">&#x2716;</div>
+            <div class="title" id="month9">September</div>
+            <div class="text" id="body9">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(10)">
+            <div class="icon" id="icon10">&#x2714;</div>
+            <div class="title" id="month10">October</div>
+            <div class="text" id="body10">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(11)">
+            <div class="icon" id="icon11">&#x2714;</div>
+            <div class="title" id="month11">November</div>
+            <div class="text" id="body11">Body text</div>
+        </div>
+        <div class="month-card" onclick="selectedCard(12)">
+            <div class="icon" id="icon12">&#x2714;</div>
+            <div class="title" id="month12">December</div>
+            <div class="text" id="body12">Body text</div>
+        </div>
+    </div>
+    <div id="back-button-container" onclick="location.href='../SearchDashboard/SearchDashboard.html'">
+        <button id="back-button">← Back</button>
+    </div>
+    <div class="custom-modal" id="successModal">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitle">Text Heading</div>
+            <button class="close-button" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody">Body text</div>
+        <div class="modal-footer">
+            <button class="filled-btn" onclick="closeModal()">Ok</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore-compat.js"></script>
+    <script src="../../../firebaseConfig.js"></script>
+    <script src="SearchMonths.js"></script>
+
+</body>
+</html>

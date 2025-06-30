@@ -6,7 +6,17 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-  <div id="header"></div>
+  <div class="topbar">
+    <div class="logo"></div>
+    <div class="nav-buttons">
+      <button id="searchBtn" class="user" onclick="searchPage()">SEARCH</button>
+      <button>Inventory</button>
+      <button>Report Bug / Suggestion</button>
+      <button id="createBtn" class="user" onclick="createNew()">CREATE NEW</button>
+      <button id="editBtn" onclick="clickedEdit()" class="edit">EDIT</button>
+    </div>
+  </div>
+
   <div class="card-grid">
     <div id="PreStockButton" onclick="preStockPage()"></div>
     <div id="WorkingStockButton" onclick="workingStockPage()"></div>

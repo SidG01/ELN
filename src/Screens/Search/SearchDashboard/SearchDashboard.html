@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Search Dashboard</title>
+    <link rel="stylesheet" href="SearchDashboard.css" />
+
+
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo"></div>
+        <div class="nav-buttons">
+            <button>Inventory</button>
+            <button>Report Bug / Suggestion</button>
+        </div>
+    </div>
+    <div class="year-navigator">
+        <div class="year-nav">
+            <button class="year-btn" onclick="fillCards('prev')">&laquo;</button>
+            <div class="year-card" onclick="selectedCard(1)">
+                <div class="arrow" id="year1Direction">&#x276E;</div>
+                <div class="year" id="year1"></div>
+                <div class="label">Click left arrow for prev years</div>
+            </div>
+            <div class="year-card" onclick="selectedCard(2)">
+                <div class="circle" id="year2Direction">&#9675;</div>
+                <div class="year" id="year2"></div>
+                <div class="label">Or select year</div>
+            </div>
+            <div class="year-card" onclick="selectedCard(3)">
+                <div class="arrow" id="year3Direction">&#x276F;</div>
+                <div class="year" id="year3"></div>
+                <div class="label">Click right arrow for prev years</div>
+            </div>
+            <button class="year-btn" onclick="fillCards('next')">&raquo;</button>
+        </div>
+    </div>
+
+    <!-- Advanced Search Section -->
+    <main>
+        <h2 class="search-title">Advanced Search</h2>
+        <div class="dropdown-group">
+            <label>
+                Experiment
+                <select id="experiment" onchange="selectedOption('experiment', 0)">
+                    <option>N / A</option>
+                    <option>Pre Stocks</option>
+                </select>
+            </label>
+            <label>
+                Specifics
+                <select id="specifics" onchange="selectedOption('specifics',1)">
+                    <option>N / A</option>
+                    <option>Biosensor</option>
+                </select>
+            </label>
+            <label>
+                Employee
+                <select id="employee" onchange="selectedOption('employee',2)">
+                    <option>N / A</option>
+                    <option>PH</option>
+                </select>
+            </label>
+            <label>
+                Date
+                <input type="date" id="date" onchange="selectedOption('date',3)"/>
+            </label>
+        </div>
+
+        <div class="bottom-actions search-buttons">
+            <button class="upload" onclick="searchContent()">Search</button>
+            <button class="procedure" onclick="clearContent()">Clear</button>
+        </div>
+    </main>
+
+
+    <div id="back-button-container" onclick="location.href='../../../index.html'">
+        <button id="back-button">← Back</button>
+    </div>
+    <div class="custom-modal" id="successModal">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitle">Text Heading</div>
+            <button class="close-button" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody">Body text</div>
+        <div class="modal-footer">
+            <button class="filled-btn" onclick="closeModal()">Ok</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore-compat.js"></script>
+    <script src="../../../firebaseConfig.js"></script>
+    <script src="SearchDashboard.js"></script>
+
+</body>
+</html>

@@ -36,7 +36,9 @@ loadCard('Spin Column', 'hGL_v2_5', '6/2/2025', 'SpinColumnButton');
 
 
 
-
+function searchPage() {
+    location.assign("Screens/Search/SearchDashboard/SearchDashboard.html");
+}
 function preStockPage() {
     location.assign("Screens/PreStock/PreStock.html");
 }
@@ -81,18 +83,6 @@ function spinCPage() {
 }
 
 
-
-
-
-
-
-
-// Load header.html and inject it into #header
-fetch('Components/Header/header.html')
-    .then(res => res.text())
-    .then(html => {
-        document.getElementById('header').innerHTML = html;
-    });
 
 async function loadCard(title, latest, date, name) {
     let html = await fetch('Components/ExperimentButton/experimentButton.html')
