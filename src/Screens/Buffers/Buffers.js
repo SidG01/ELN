@@ -3,6 +3,7 @@ let batchNumber = "";
 
 let editMode = false;
 let createMode = false;
+let fillCheck = false;
 
 let employees = []
 let employeeCheck = []
@@ -30,6 +31,7 @@ fetchAndFill(db.collection("Buffer").doc("NewExperiment").collection("Buffer"), 
 document.getElementById("successModal").style.display = "none";
 
 function selectedOption(idName) {
+    fillCheck = false;
     if (document.getElementById(idName).selectedIndex === 0) {
         document.getElementById("bufferC").style.border = "3px double red";
         document.getElementById("bufferC").style.padding = "5px";
@@ -37,6 +39,7 @@ function selectedOption(idName) {
         fillBatchNumber(currentBuffer);
     }
     else {
+        fillCheck = true;
         document.getElementById("bufferC").style.border = "";
         document.getElementById("bufferC").style.padding = "";
         for (let i = 0; i < materialsID.length; i++) {
@@ -220,7 +223,7 @@ function fillBatchNumber(Value) {
     if (d.getDate() < 10) {
         day = "0" + d.getDate();
     }
-    batchNumber = Value + "-"  + (month) + (day) + (d.getFullYear()) + ".";
+    batchNumber = Value + "."  + (month) + (day) + (d.getFullYear()) + ".";
     for (let i = 0; i < employeeUsed.length; i++) {
         batchNumber += employeeUsed[i]
     }
@@ -403,6 +406,63 @@ function createNew() {
         document.getElementById("modalBody").textContent = "You can now use this template for future Buffer entries.";
         fetchAndFill(db.collection("Buffer").doc("NewExperiment").collection("Buffer"), false);
         calculate()
+    }
+}
+
+function upload() {
+    let safeToUpload = true;
+    if (fillCheck === false) {
+        safeToUpload = false;
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Selection";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please make sure all selections are made before saving.";
+    }
+    else if (employeeUsed.length === 0) {
+        safeToUpload = false;
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Employee Selection";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please select at least one employee before saving.";
+    }
+    else {
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        const d = new Date();
+        let month = months[d.getMonth()];
+        console.log(d.getFullYear())
+        const path = db.collection("Buffer")
+            .doc(d.getFullYear().toString())
+            .collection(month)
+            .doc(batchNumber.toString());
+        console.log(path);
+        const newData = {};
+
+        for (let i = 0; i < ingredientsArray.length; i++) {
+            const name = ingredientsArray[i];
+            newData[name] = {
+                Desc: ingredientsDescArray[i],
+                Weight: weightArray[i],
+                WeightDesc: weightDescArray[i],
+                Concentration: concentrationArray[i],
+                ConcentrationDesc: concentrationDescArray[i]
+            };
+        }
+        newData.Volume = document.getElementById("volume").value
+        newData.BufferX = document.getElementById("bufferx").value
+        newData.Notes = document.getElementById("notes").value
+
+        path.set(newData)
+            .then(() => {
+                console.log("Data successfully uploaded!");
+            })
+            .catch((error) => {
+                console.error("Error uploading document:", error);
+            });
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Successfully uploaded experiment!";
+        document.getElementById("modalTitle").style.color = "green"
+        document.getElementById("modalBody").textContent = "Navigate through history in the nav bar OR search using the provided options";
     }
 }
 

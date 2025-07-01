@@ -18,6 +18,7 @@ let partsDescArray = [];
 let volumeArray = [];
 let volumeDescArray = [];
 let tempLength = 0;
+let fillCheck = false
 
 // fill with database
 employees = ["PH", "SG", "KT", "CL"]
@@ -88,7 +89,7 @@ function fillBatchNumber(currentWS) {
     if (d.getDate() < 10) {
         day = "0" + d.getDate();
     }
-    batchNumber = "WS" + "-" + currentWS + "-"  + (month) + (day) + (d.getFullYear()) + ".";
+    batchNumber = "WS" + "-" + currentWS + "."  + (month) + (day) + (d.getFullYear()) + ".";
     for (let i = 0; i < employeeUsed.length; i++) {
         batchNumber += employeeUsed[i]
     }
@@ -153,9 +154,11 @@ function selectedOption(idName) {
         document.getElementById("workingStockC").style.border = "3px double red";
         document.getElementById("workingStockC").style.padding = "5px";
         currentWS = "Choose First";
+        fillCheck = false;
         fillBatchNumber(currentWS);
     }
     else {
+        fillCheck = true;
         document.getElementById("workingStockC").style.border = "";
         document.getElementById("workingStockC").style.padding = "";
         let children = document.getElementById("PartsCard").children;
@@ -499,65 +502,59 @@ function clickedEdit() {
     }
 }
 
-// function upload() {
-//     let safeToUpload = true;
-//     if (fillCheck.includes(false)) {
-//         safeToUpload = false;
-//         document.getElementById("successModal").style.display = "block";
-//         document.getElementById("modalTitle").textContent = "Error: Missing Selection";
-//         document.getElementById("modalTitle").style.color = "red"
-//         document.getElementById("modalBody").textContent = "Please make sure all selections are made before saving.";
-//     }
-//     else if (employeeUsed.length === 0) {
-//         safeToUpload = false;
-//         document.getElementById("successModal").style.display = "block";
-//         document.getElementById("modalTitle").textContent = "Error: Missing Employee Selection";
-//         document.getElementById("modalTitle").style.color = "red"
-//         document.getElementById("modalBody").textContent = "Please select at least one employee before saving.";
-//     }
-//     else {
-//         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-//
-//         const d = new Date();
-//         let month = months[d.getMonth()];
-//         console.log(d.getFullYear())
-//         const path = db.collection("PreStock")
-//             .doc(d.getFullYear().toString())
-//             .collection(month)
-//             .doc(batchNumber.toString());
-//         console.log(path);
-//
-//         const newData = {
-//             Plate: plateArray,
-//             PlateDesc: plateDescArray,
-//             From: fromArray,
-//             FromDesc: fromDescArray,
-//             To: toArray,
-//             ToDesc: toDescArray,
-//             Oligos: numOligos,
-//             Base: currentPsBase,
-//             WorkingStock: currentWorkingStock,
-//             Name: currentPsName,
-//             Short: currentPsShort,
-//             TVolume: document.getElementById("Vtarget").value,
-//             VWell: document.getElementById("Vwell").value,
-//             VTotal: document.getElementById("Vtotal").value,
-//             Employees: employeeUsed,
-//             Notes: document.getElementById("notes").value,
-//         }
-//         path.set(newData)
-//             .then(() => {
-//                 console.log("Data successfully uploaded!");
-//             })
-//             .catch((error) => {
-//                 console.error("Error uploading document:", error);
-//             });
-//         document.getElementById("successModal").style.display = "block";
-//         document.getElementById("modalTitle").textContent = "Successfully uploaded experiment!";
-//         document.getElementById("modalTitle").style.color = "green"
-//         document.getElementById("modalBody").textContent = "Navigate through history in the nav bar OR search using the provided options";
-//     }
-// }
+function upload() {
+    let safeToUpload = true;
+    if (fillCheck === false) {
+        safeToUpload = false;
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Selection";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please make sure all selections are made before saving.";
+    }
+    else if (employeeUsed.length === 0) {
+        safeToUpload = false;
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Employee Selection";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please select at least one employee before saving.";
+    }
+    else {
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        const d = new Date();
+        let month = months[d.getMonth()];
+        console.log(d.getFullYear())
+        const path = db.collection("WorkingStock")
+            .doc(d.getFullYear().toString())
+            .collection(month)
+            .doc(batchNumber.toString());
+        console.log(path);
+        const newData = {};
+
+        for (let i = 0; i < prestocksArray.length; i++) {
+            newData[prestocksArray[i]] = {
+                Parts: partsArray[i],
+                Volume: volumeArray[i],
+
+            };
+        }
+        newData.TargetVolume = document.getElementById("TargetVol").value
+        newData.TotalWSVol = document.getElementById("TotalVol").value
+        newData.Notes = document.getElementById("notes").value
+
+        path.set(newData)
+            .then(() => {
+                console.log("Data successfully uploaded!");
+            })
+            .catch((error) => {
+                console.error("Error uploading document:", error);
+            });
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Successfully uploaded experiment!";
+        document.getElementById("modalTitle").style.color = "green"
+        document.getElementById("modalBody").textContent = "Navigate through history in the nav bar OR search using the provided options";
+    }
+}
 
 function closeModal() {
     document.getElementById("successModal").style.display = "none";

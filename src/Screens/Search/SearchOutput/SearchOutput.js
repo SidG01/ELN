@@ -1,8 +1,10 @@
 const db = firebase.firestore();
 
 const params = new URLSearchParams(window.location.search);
-let selectedYear = params.get("selectedYear");
+let selectedYear = parseInt(params.get("selectedYear"), 10);
 let selectedMonth = params.get("selectedMonth");
+const months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+let currentMonthIndex = months.indexOf(selectedMonth)
 let selectedExperiment = params.get("selectedExperiment");
 let selectedSpecifics = params.get("selectedSpecifics");
 let selectedEmployee = params.get("selectedEmployee");
@@ -25,7 +27,7 @@ document.getElementById("subHeading").innerHTML = ("All Contents In " + selected
 runSearchAfterFill();
 async function runSearchAfterFill() {
     await fetchAndFill(db.collection("Experiments"), false);
-    searchQuerry(selectedYear, selectedMonth, selectedExperiment, selectedSpecifics, selectedEmployee, selectedDate);
+    searchQuerry(selectedYear.toString(), selectedMonth, selectedExperiment, selectedSpecifics, selectedEmployee, selectedDate);
 }
 
 
@@ -57,7 +59,7 @@ function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE) {
         case '110000':
             console.log("Only YEAR and MONTH present");
             for(let i = 0; i < experimentNames.length; i++) {
-                querryFill(db.collection(experimentNames[i]).doc(selectedYear).collection(selectedMonth), "")
+                querryFill(db.collection(experimentNames[i]).doc(selectedYear.toString()).collection(selectedMonth), experimentNames[i])
             }
             break;
         case '110001':
@@ -116,7 +118,7 @@ function querryFill(path, titleContent) {
             item.classList.add("accordion-item");
             item.dataset.docId = doc.id;
             title.className = "accordion-title";
-            title.textContent = titleContent + " " + doc.id;
+            title.textContent = titleContent + "\u00A0\u00A0\u00A0 | \u00A0\u00A0\u00A0" + doc.id;
             content.className = "accordion-content";
             content.textContent = "Loading...";
 
@@ -136,8 +138,10 @@ function querryFill(path, titleContent) {
                 const rows = Object.entries(data).map(([key, value]) => `
                     <tr>
                         <td class="key">${key}</td>
-                        <td>${Array.isArray(value) ? value.join(", ") : value}</td>
-                    </tr>`).join("");
+                        <td>${formatValue(value)}</td>
+                    </tr>
+                `).join("");
+
 
                 content.innerHTML = `
                     <table class="accordion-table">
@@ -153,6 +157,57 @@ function querryFill(path, titleContent) {
     });
 }
 
+function formatValue(value) {
+    if (Array.isArray(value)) {
+        return value.join(", ");
+    } else if (typeof value === "object" && value !== null) {
+        let inner = "<div class='nested-table'>";
+        for (const [k, v] of Object.entries(value)) {
+            inner += `
+                <div class="nested-row">
+                    <span class="nested-key">${k}</span>
+                    <span class="nested-value">${formatValue(v)}</span>
+                </div>
+            `;
+        }
+        inner += "</div>";
+        return inner;
+    } else {
+        return value;
+    }
+}
+
+function prevMonth() {
+    if (currentMonthIndex === 1) {
+        currentMonthIndex = 12;
+        selectedYear = selectedYear - 1;
+        selectedMonth = months[currentMonthIndex]
+    }
+    else {
+        currentMonthIndex = months.indexOf(selectedMonth) - 1;
+        selectedMonth = months[currentMonthIndex];
+    }
+    searchQuerry(selectedYear.toString(), selectedMonth, selectedExperiment, selectedSpecifics, selectedEmployee, selectedDate);
+    document.getElementById("Heading").innerHTML = selectedMonth;
+    document.getElementById("subHeading").innerHTML = ("All Contents In " + selectedMonth  + " of " + selectedYear);
+
+}
+
+function nextMonth() {
+    if (currentMonthIndex === 12) {
+        currentMonthIndex = 1;
+        selectedYear = selectedYear + 1;
+        selectedMonth = months[currentMonthIndex];
+    }
+    else {
+        currentMonthIndex = months.indexOf(selectedMonth) + 1;
+        selectedMonth = months[currentMonthIndex];
+    }
+    searchQuerry(selectedYear.toString(), selectedMonth, selectedExperiment, selectedSpecifics, selectedEmployee, selectedDate);
+    document.getElementById("Heading").innerHTML = selectedMonth;
+    document.getElementById("subHeading").innerHTML = ("All Contents In " + selectedMonth  + " of " + selectedYear);
+
+}
 
 async function fetchAndFill(path, getData) {
     fillArray = [];

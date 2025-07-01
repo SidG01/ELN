@@ -533,6 +533,7 @@ body {
     padding: 18px 22px;
     font-weight: bold;
     font-size: 16px;
+    text-align: left;
     position: relative;
     cursor: pointer;
     background: #f9f9f9;
@@ -610,4 +611,30 @@ body {
     width: 30%;
     color: #333;
 }
+
+.nested-table {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 10px;
+    border-left: 2px solid #eee;
+    margin-top: 4px;
+    font-size: 13px;
+    color: #444;
+}
+
+.nested-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.nested-key {
+    font-weight: bold;
+}
+
+.nested-value {
+    text-align: right;
+    word-break: break-word;
+}
+
 
