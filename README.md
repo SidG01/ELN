@@ -5,7 +5,6 @@ A custom software solution designed to streamline
 experimental data capture, storage, and analysis for 
 synthetic biology and nanotechnology research teams.
 
-## Overview ##
 This ELN was developed to meet the specific needs of
 **[DNA Nanobots, LLC](https://dnananobots.com)**,
 supporting advanced research workflows involving 
