@@ -10,35 +10,35 @@ let selectedDate = params.get("selectedDate");
 let employees = []
 employees = ["PH", "SG", "KT", "CL"]
 
+let fillArray = []
 let searchCritera = [false, false, false, false];
 let experimentNames = [];
 let searchNames = ["experiment", "specifics", "employee", "date"];
+let searchSpecifics = [""]
 let layer = 0;
-let specificID = "";
-let currentExperiment = "";
-let fillArray = [];
-let currentSpecifics = "";
-let currentEmployee = "";
-let currentDate = "";
 let currentYear = new Date().getFullYear() - 1;
 
 document.getElementById("successModal").style.display = "none";
+document.getElementById("Heading").innerHTML = selectedMonth;
+document.getElementById("subHeading").innerHTML = ("All Contents In " + selectedMonth  + " of " + selectedYear);
+
 runSearchAfterFill();
 async function runSearchAfterFill() {
     await fetchAndFill(db.collection("Experiments"), false);
-    selectedYear = null;
-    selectedMonth = null;
     searchQuerry(selectedYear, selectedMonth, selectedExperiment, selectedSpecifics, selectedEmployee, selectedDate);
 }
 
-console.log(selectedMonth); // Logs: 2025
-console.log(selectedYear);
-console.log(selectedExperiment);
-if (selectedExperiment === null) {
-    console.log("yes")
-}
 
-function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE, ) {
+// console.log(selectedMonth); // Logs: 2025
+// console.log(selectedYear);
+// console.log(selectedExperiment);
+// if (selectedExperiment === null) {
+//     console.log("yes")
+// }
+
+let accordionLength = 0;
+function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE) {
+    accordionLength = 0;
     const binary = [
         YEAR != null ? 1 : 0,
         MONTH != null ? 1 : 0,
@@ -49,10 +49,16 @@ function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE, ) {
     ];
 
     const comboKey = binary.join(''); // e.g., "110011"
-
+    const accordion = document.querySelector('.accordion');
+    if (accordion) {
+        accordion.querySelectorAll('.accordion-item').forEach(item => item.remove());
+    }
     switch (comboKey) {
         case '110000':
             console.log("Only YEAR and MONTH present");
+            for(let i = 0; i < experimentNames.length; i++) {
+                querryFill(db.collection(experimentNames[i]).doc(selectedYear).collection(selectedMonth))
+            }
             break;
         case '110001':
             console.log("YEAR, MONTH, DATE present");
@@ -91,49 +97,115 @@ function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE, ) {
             console.log("Unhandled combination:", comboKey);
     }
 }
-// const items = document.querySelectorAll('.accordion-item');
-//
-//             items.forEach(item => {
-//                 item.querySelector('.accordion-title').addEventListener('click', () => {
-//                     items.forEach(i => i !== item && i.classList.remove('open'));
-//                     item.classList.toggle('open');
-//                 });
-//             });
+
+function querryFill(path) {
+    querryArray = [];
+    path.get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            querryArray.push(doc.id);
+            const currentIndex = accordionLength++;
+
+            const accordion = document.querySelector(".accordion");
+            if (!accordion) {
+                console.error("Accordion container not found.");
+                return;
+            }
+
+            const item = document.createElement("div");
+            const title = document.createElement("div");
+            const content = document.createElement("div");
+
+            item.className = "accordion-item";
+            title.className = "accordion-title";
+            title.textContent = doc.id;
+
+            content.className = "accordion-content";
+            content.id = "accordionContent" + currentIndex;
+            content.textContent = "Loading..."; // temporary placeholder
+
+            item.appendChild(title);
+            item.appendChild(content);
+            accordion.appendChild(item);
+
+            item.addEventListener('click', () => {
+                const allItems = document.querySelectorAll('.accordion-item');
+                allItems.forEach(i => {
+                    if (i !== item) i.classList.remove('open');
+                });
+                item.classList.toggle('open');
+            });
+
+            // Fetch and display actual document data
+            path.doc(doc.id).get().then((docSnap) => {
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    let text = "";
+                    for (const [key, value] of Object.entries(data)) {
+                        if (Array.isArray(value)) {
+                            text += `${key}:\n  ${value.join(", ")}\n\n`;
+                        } else {
+                            text += `${key}: ${value}\n\n`;
+                        }
+                    }
+                    const contentElem = document.getElementById("accordionContent" + currentIndex);
+                    if (contentElem) {
+                        let html = "<table style='border-collapse: collapse; width: 100%;'>";
+                        for (const [key, value] of Object.entries(data)) {
+                            html += `<tr>
+        <td style="font-weight: bold; padding: 4px; border-bottom: 1px solid #ccc;">${key}</td>
+        <td style="padding: 4px; border-bottom: 1px solid #ccc;">${Array.isArray(value) ? value.join(", ") : value}</td>
+    </tr>`;
+                        }
+                        html += "</table>";
+
+                        const contentElem = document.getElementById("accordionContent" + currentIndex);
+                        if (contentElem) {
+                            contentElem.innerHTML = html;
+                        }
+
+                    }
+                } else {
+                    console.warn("No data found for doc:", doc.id);
+                }
+            }).catch((error) => {
+                console.error("Error getting subdoc:", error);
+            });
+        });
+
+        console.log(querryArray);
+    }).catch((error) => {
+        console.error("Error fetching documents:", error);
+    });
+}
 
 async function fetchAndFill(path, getData) {
     fillArray = [];
+
     try {
         if (getData) {
-            path.get().then(async (doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    specificID = data.collectionID;
-                    console.log(specificID);
-                    await fetchAndFill(db.collection(currentExperiment).doc("NewExperiment").collection(specificID), false);
-                    // fillArray.push(doc.id);
-                    // fill("specifics", fillArray);
-                } else {
-                    console.log("Document does not exist");
-                }
-            }).catch((error) => {
-                console.error("Error fetching document:", error);
-            });
+            const doc = await path.get();
+            if (doc.exists) {
+                const data = doc.data();
+                specificID = data.collectionID;
+                searchSpecifics.push(data.collectionID);
+                await fetchAndFill(db.collection(currentExperiment).doc("NewExperiment").collection(specificID), false);
+            } else {
+                console.log("Document does not exist");
+            }
         } else {
-            path.get().then((querySnapshot) => {
-                querySnapshot.forEach((doc) => {
-                    fillArray.push(doc.id);
-                    experimentNames.push(doc.id);
-                });
-                fill(searchNames[layer], fillArray);
-                layer++;
-            }).catch((error) => {
-                console.error("Error fetching documents:", error);
+            const querySnapshot = await path.get();
+            querySnapshot.forEach((doc) => {
+                fillArray.push(doc.id);
+                experimentNames.push(doc.id);
             });
+            fill(searchNames[layer], fillArray);
+            layer++;
         }
     } catch (error) {
-        console.error("Error in fetchAndFill: ", error)
+        console.error("Error in fetchAndFill:", error);
     }
 }
+
 
 function fill(idName, content) {
     let options = document.getElementById(idName);
@@ -157,7 +229,6 @@ function selectedOption(id, index) {
     if (id === "experiment") {
         layer = 1;
         currentExperiment = document.getElementById(id).value;
-        console.log(experimentNames[document.getElementById(id).selectedIndex - 1]);
         fetchAndFill(db.collection("Experiments").doc(experimentNames[document.getElementById(id).selectedIndex - 1]), true).then(r => console.log("ignore this log"));
     } else if (id === "specifics") {
         currentSpecifics = document.getElementById(id).value;
