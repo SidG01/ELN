@@ -57,7 +57,7 @@ function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE) {
         case '110000':
             console.log("Only YEAR and MONTH present");
             for(let i = 0; i < experimentNames.length; i++) {
-                querryFill(db.collection(experimentNames[i]).doc(selectedYear).collection(selectedMonth))
+                querryFill(db.collection(experimentNames[i]).doc(selectedYear).collection(selectedMonth), "")
             }
             break;
         case '110001':
@@ -98,85 +98,61 @@ function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE) {
     }
 }
 
-function querryFill(path) {
+function querryFill(path, titleContent) {
     querryArray = [];
+
     path.get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
             querryArray.push(doc.id);
-            const currentIndex = accordionLength++;
-
+            accordionLength++;
             const accordion = document.querySelector(".accordion");
-            if (!accordion) {
-                console.error("Accordion container not found.");
-                return;
-            }
+            if (!accordion) return console.error("Accordion container not found.");
 
             const item = document.createElement("div");
             const title = document.createElement("div");
             const content = document.createElement("div");
 
-            item.className = "accordion-item";
+            item.id = "accordionItem" + accordionLength;
+            item.classList.add("accordion-item");
+            item.dataset.docId = doc.id;
             title.className = "accordion-title";
-            title.textContent = doc.id;
-
+            title.textContent = titleContent + " " + doc.id;
             content.className = "accordion-content";
-            content.id = "accordionContent" + currentIndex;
-            content.textContent = "Loading..."; // temporary placeholder
+            content.textContent = "Loading...";
 
-            item.appendChild(title);
-            item.appendChild(content);
+            item.append(title, content);
             accordion.appendChild(item);
 
-            item.addEventListener('click', () => {
-                const allItems = document.querySelectorAll('.accordion-item');
-                allItems.forEach(i => {
-                    if (i !== item) i.classList.remove('open');
+            title.addEventListener("click", () => {
+                document.querySelectorAll(".accordion-item").forEach((i) => {
+                    if (i !== item) i.classList.remove("open");
                 });
-                item.classList.toggle('open');
+                item.classList.toggle("open");
             });
 
-            // Fetch and display actual document data
             path.doc(doc.id).get().then((docSnap) => {
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    let text = "";
-                    for (const [key, value] of Object.entries(data)) {
-                        if (Array.isArray(value)) {
-                            text += `${key}:\n  ${value.join(", ")}\n\n`;
-                        } else {
-                            text += `${key}: ${value}\n\n`;
-                        }
-                    }
-                    const contentElem = document.getElementById("accordionContent" + currentIndex);
-                    if (contentElem) {
-                        let html = "<table style='border-collapse: collapse; width: 100%;'>";
-                        for (const [key, value] of Object.entries(data)) {
-                            html += `<tr>
-        <td style="font-weight: bold; padding: 4px; border-bottom: 1px solid #ccc;">${key}</td>
-        <td style="padding: 4px; border-bottom: 1px solid #ccc;">${Array.isArray(value) ? value.join(", ") : value}</td>
-    </tr>`;
-                        }
-                        html += "</table>";
+                if (!docSnap.exists) return;
+                const data = docSnap.data();
+                const rows = Object.entries(data).map(([key, value]) => `
+                    <tr>
+                        <td class="key">${key}</td>
+                        <td>${Array.isArray(value) ? value.join(", ") : value}</td>
+                    </tr>`).join("");
 
-                        const contentElem = document.getElementById("accordionContent" + currentIndex);
-                        if (contentElem) {
-                            contentElem.innerHTML = html;
-                        }
-
-                    }
-                } else {
-                    console.warn("No data found for doc:", doc.id);
-                }
-            }).catch((error) => {
-                console.error("Error getting subdoc:", error);
+                content.innerHTML = `
+                    <table class="accordion-table">
+                        <tbody>${rows}</tbody>
+                    </table>
+                `;
+            }).catch((err) => {
+                console.error("Error fetching doc:", err);
             });
         });
-
-        console.log(querryArray);
     }).catch((error) => {
         console.error("Error fetching documents:", error);
     });
 }
+
 
 async function fetchAndFill(path, getData) {
     fillArray = [];
