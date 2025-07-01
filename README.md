@@ -1,4 +1,5 @@
 # DNA Nanobots ELN #
+
 Electronic Lab Notebook (ELN) Software for
 [DNA Nanobots, LLC](https://dnananobots.com)  
 A custom software solution designed to streamline 
@@ -9,7 +10,7 @@ This ELN was developed to meet the specific needs of
 supporting advanced research workflows involving 
 DNA-based nanostructures and automated experimentation
 pipelines.
----
+
 
 ## Contact
 For feature requests, technical issues, or general inquiries, please reach out to:
