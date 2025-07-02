@@ -268,6 +268,23 @@ function addCardContent() {
 
 }
 
+function closeFeedbackModal() {
+    document.getElementById("feedbackModal").style.display = "none";
+}
+
+function submitFeedback() {
+    const feedback = document.getElementById("feedbackTextarea").value.trim();
+    if (feedback !== "") {
+        console.log("Submitted Feedback:", feedback);
+        // Add Firebase or server logic here if needed
+
+        closeFeedbackModal(); // Auto-close after submit
+        alert("Thank you for your feedback!");
+    } else {
+        alert("Please enter your feedback before submitting.");
+    }
+}
+
 function closeModal() {
     document.getElementById("successModal").style.display = "none";
 }

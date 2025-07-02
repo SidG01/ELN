@@ -17,7 +17,7 @@
 
 
 
-
+document.getElementById("feedbackModal").style.display = "none";
 
 loadCard('Pre-Stock', 'hGL_v2_5', '5/15/2025', 'PreStockButton');
 loadCard('Working Stock', 'hGL_4x4x4_F4', '6/2/2025', 'WorkingStockButton');
@@ -82,6 +82,27 @@ function spinCPage() {
     location.assign("Screens/SpinColumn/SpinColumn.html");
 }
 
+function closeFeedbackModal() {
+    document.getElementById("feedbackModal").style.display = "none";
+}
+
+function submitFeedback() {
+    const feedback = document.getElementById("feedbackTextarea").value.trim();
+    const path = db.collection("Feedback").doc();
+    const newData = {
+        Ticket: feedback,
+        Timestamp: new Date(),
+    };
+    path.set(newData)
+        .then(() => {
+            console.log("Data successfully uploaded!");
+        })
+        .catch((error) => {
+            console.error("Error uploading document:", error);
+        });
+
+    closeFeedbackModal();
+}
 
 
 async function loadCard(title, latest, date, name) {

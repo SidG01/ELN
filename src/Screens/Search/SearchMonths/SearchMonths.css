@@ -498,3 +498,22 @@ main {
     font-size: 14px;
     color: #555;
 }
+
+.feedback-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.feedback-textarea {
+    width: 100%;
+    height: 100px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    resize: vertical;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}

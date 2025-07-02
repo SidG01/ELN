@@ -99,6 +99,7 @@ function fetchAndFill(path, index, getData) {
 // Start the process with first selection
 fetchAndFill(db.collection("PreStock").doc("NewExperiment").collection(fillContext[0]).get(),0, false);
 document.getElementById("successModal").style.display = "none";
+document.getElementById("feedbackModal").style.display = "none";
 document.getElementById("oligos").disabled = true;
 
 // fills employeeUsed with all employees that are selected
@@ -789,6 +790,28 @@ function upload() {
 function changedVolume() {
     document.getElementById("Vwell").value = document.getElementById("Vtarget").value * (0.4) * (1/200);
     document.getElementById("Vtotal").value = document.getElementById("Vwell").value * (numOligos);
+}
+
+function closeFeedbackModal() {
+    document.getElementById("feedbackModal").style.display = "none";
+}
+
+function submitFeedback() {
+    const feedback = document.getElementById("feedbackTextarea").value.trim();
+    const path = db.collection("Feedback").doc();
+    const newData = {
+        Ticket: feedback,
+        Timestamp: new Date(),
+    };
+    path.set(newData)
+        .then(() => {
+            console.log("Data successfully uploaded!");
+        })
+        .catch((error) => {
+            console.error("Error uploading document:", error);
+        });
+
+    closeFeedbackModal();
 }
 
 function closeModal() {

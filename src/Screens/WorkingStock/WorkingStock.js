@@ -29,6 +29,7 @@ let fillArray = [];
 
 fetchAndFill(db.collection("WorkingStock").doc("NewExperiment").collection("workingStock"), false);
 document.getElementById("successModal").style.display = "none";
+document.getElementById("feedbackModal").style.display = "none";
 
 function fetchAndFill(path, getData) {
     fillArray = [];
@@ -554,6 +555,28 @@ function upload() {
         document.getElementById("modalTitle").style.color = "green"
         document.getElementById("modalBody").textContent = "Navigate through history in the nav bar OR search using the provided options";
     }
+}
+
+function closeFeedbackModal() {
+    document.getElementById("feedbackModal").style.display = "none";
+}
+
+function submitFeedback() {
+    const feedback = document.getElementById("feedbackTextarea").value.trim();
+    const path = db.collection("Feedback").doc();
+    const newData = {
+        Ticket: feedback,
+        Timestamp: new Date(),
+    };
+    path.set(newData)
+        .then(() => {
+            console.log("Data successfully uploaded!");
+        })
+        .catch((error) => {
+            console.error("Error uploading document:", error);
+        });
+
+    closeFeedbackModal();
 }
 
 function closeModal() {

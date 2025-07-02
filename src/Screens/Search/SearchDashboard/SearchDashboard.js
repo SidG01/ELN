@@ -15,6 +15,8 @@ let currentDate = "";
 let currentYear = new Date().getFullYear() - 1;
 
 document.getElementById("successModal").style.display = "none";
+document.getElementById("feedbackModal").style.display = "none";
+
 fetchAndFill(db.collection("Experiments"), false);
 const d = new Date();
 fillCards("next");
@@ -128,6 +130,28 @@ function searchContent() {
 
 function clearContent() {
     layer = 1;
+}
+
+function closeFeedbackModal() {
+    document.getElementById("feedbackModal").style.display = "none";
+}
+
+function submitFeedback() {
+    const feedback = document.getElementById("feedbackTextarea").value.trim();
+    const path = db.collection("Feedback").doc();
+    const newData = {
+        Ticket: feedback,
+        Timestamp: new Date(),
+    };
+    path.set(newData)
+        .then(() => {
+            console.log("Data successfully uploaded!");
+        })
+        .catch((error) => {
+            console.error("Error uploading document:", error);
+        });
+
+    closeFeedbackModal();
 }
 
 function closeModal() {

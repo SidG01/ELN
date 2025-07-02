@@ -21,6 +21,7 @@ let layer = 0;
 let currentYear = new Date().getFullYear() - 1;
 
 document.getElementById("successModal").style.display = "none";
+document.getElementById("feedbackModal").style.display = "none";
 document.getElementById("Heading").innerHTML = selectedMonth;
 document.getElementById("subHeading").innerHTML = ("All Contents In " + selectedMonth  + " of " + selectedYear);
 
@@ -49,8 +50,7 @@ function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE) {
         EMPLOYEE != null ? 1 : 0,
         DATE != null ? 1 : 0,
     ];
-
-    const comboKey = binary.join(''); // e.g., "110011"
+    const comboKey = binary.join('');
     const accordion = document.querySelector('.accordion');
     if (accordion) {
         accordion.querySelectorAll('.accordion-item').forEach(item => item.remove());
@@ -58,9 +58,16 @@ function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE) {
     switch (comboKey) {
         case '110000':
             console.log("Only YEAR and MONTH present");
-            for(let i = 0; i < experimentNames.length; i++) {
-                querryFill(db.collection(experimentNames[i]).doc(selectedYear.toString()).collection(selectedMonth), experimentNames[i])
-            }
+            const promises = experimentNames.map((name) => {
+                const path = db.collection(name).doc(YEAR).collection(MONTH);
+                return querryFill(path, name);
+            });
+
+            Promise.all(promises).then(() => {
+                filter('experiment');
+            }).catch((err) => {
+                console.error("Error running querryFill:", err);
+            });
             break;
         case '110001':
             console.log("YEAR, MONTH, DATE present");
@@ -100,66 +107,113 @@ function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE) {
     }
 }
 
+function filter(id) {
+    if (document.getElementById(id).selectedIndex === 0) {
+        for (let i = 0; i < accordionLength; i++) {
+            document.getElementById("accordionItem" + (i + 1)).style.display = "";
+        }
+    }
+    else {
+        for (let i = 0; i < accordionLength; i++) {
+            const titleElement = document.getElementById("accordionTitle" + (i + 1));
+            const extractedTitle = titleElement.textContent.split(/\s+\|\s+/)[0].trim();
+            console.log("Full Title:", titleElement.textContent);
+            console.log("Extracted Title:", extractedTitle);
+            if (extractedTitle !== document.getElementById(id).value) {
+                document.getElementById("accordionItem" + (i + 1)).style.display = "none";
+            }
+            else {
+                document.getElementById("accordionItem" + (i + 1)).style.display = "";
+            }
+        }
+    }
+
+}
+
+function selectedOption(id, index) {
+    if (document.getElementById(id).selectedIndex === 0) {
+        searchCritera[index] = false;
+        for (let i = 0; i < accordionLength; i++) {
+            document.getElementById("accordionItem" + (i + 1)).style.display = "";
+        }
+    }
+    else {
+        searchCritera[index] = true;
+        if (id === "experiment") {
+            layer = 1;
+            currentExperiment = document.getElementById(id).value;
+            fetchAndFill(db.collection("Experiments").doc(experimentNames[document.getElementById(id).selectedIndex - 1]), true).then(r => console.log("ignore this log"));
+            filter('experiment')
+        } else if (id === "specifics") {
+            currentSpecifics = document.getElementById(id).value;
+        } else if (id === "employee") {
+            currentEmployee = document.getElementById(id).value;
+        } else if (id === "date") {
+            currentDate = document.getElementById(id).value;
+        }
+    }
+}
+
 function querryFill(path, titleContent) {
-    querryArray = [];
+    return new Promise((resolve, reject) => {
+        querryArray = [];
 
-    path.get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            querryArray.push(doc.id);
-            accordionLength++;
-            const accordion = document.querySelector(".accordion");
-            if (!accordion) return console.error("Accordion container not found.");
+        path.get().then((querySnapshot) => {
+            const docs = querySnapshot.docs;
+            if (!docs.length) return resolve();
 
-            const item = document.createElement("div");
-            const title = document.createElement("div");
-            const content = document.createElement("div");
+            let pending = docs.length;
 
-            item.id = "accordionItem" + accordionLength;
-            item.classList.add("accordion-item");
-            item.dataset.docId = doc.id;
-            title.className = "accordion-title";
-            title.textContent = titleContent + "\u00A0\u00A0\u00A0 | \u00A0\u00A0\u00A0" + doc.id;
-            content.className = "accordion-content";
-            content.textContent = "Loading...";
+            docs.forEach((doc) => {
+                querryArray.push(doc.id);
+                accordionLength++;
 
-            item.append(title, content);
-            accordion.appendChild(item);
+                const accordion = document.querySelector(".accordion");
+                if (!accordion) return reject("Accordion container not found");
 
-            title.addEventListener("click", () => {
-                document.querySelectorAll(".accordion-item").forEach((i) => {
-                    if (i !== item) i.classList.remove("open");
+                const item = document.createElement("div");
+                const title = document.createElement("div");
+                const content = document.createElement("div");
+
+                item.id = "accordionItem" + accordionLength;
+                item.classList.add("accordion-item");
+                item.dataset.docId = doc.id;
+                title.id = "accordionTitle" + accordionLength;
+                title.className = "accordion-title";
+                title.textContent = titleContent + "   |   " + doc.id;
+                content.className = "accordion-content";
+                content.textContent = "Loading...";
+
+                item.append(title, content);
+                accordion.appendChild(item);
+
+                title.addEventListener("click", () => {
+                    document.querySelectorAll(".accordion-item").forEach((i) => {
+                        if (i !== item) i.classList.remove("open");
+                    });
+                    item.classList.toggle("open");
                 });
-                item.classList.toggle("open");
+
+                path.doc(doc.id).get().then((docSnap) => {
+                    if (docSnap.exists) {
+                        const data = docSnap.data();
+                        const rows = Object.entries(data)
+                            .map(([k, v]) => `<tr><td class="key">${k}</td><td>${v}</td></tr>`)
+                            .join("");
+
+                        content.innerHTML = `<table class="accordion-table"><tbody>${rows}</tbody></table>`;
+                    }
+                    if (--pending === 0) resolve(); // All docs done
+                }).catch(reject);
             });
-
-            path.doc(doc.id).get().then((docSnap) => {
-                if (!docSnap.exists) return;
-                const data = docSnap.data();
-                const rows = Object.entries(data).map(([key, value]) => `
-                    <tr>
-                        <td class="key">${key}</td>
-                        <td>${formatValue(value)}</td>
-                    </tr>
-                `).join("");
-
-
-                content.innerHTML = `
-                    <table class="accordion-table">
-                        <tbody>${rows}</tbody>
-                    </table>
-                `;
-            }).catch((err) => {
-                console.error("Error fetching doc:", err);
-            });
-        });
-    }).catch((error) => {
-        console.error("Error fetching documents:", error);
+        }).catch(reject);
     });
 }
 
+
 function formatValue(value) {
     if (Array.isArray(value)) {
-        return value.join(", ");
+        value.join(", ");
     } else if (typeof value === "object" && value !== null) {
         let inner = "<div class='nested-table'>";
         for (const [k, v] of Object.entries(value)) {
@@ -203,7 +257,17 @@ function nextMonth() {
         currentMonthIndex = months.indexOf(selectedMonth) + 1;
         selectedMonth = months[currentMonthIndex];
     }
-    searchQuerry(selectedYear.toString(), selectedMonth, selectedExperiment, selectedSpecifics, selectedEmployee, selectedDate);
+    searchQuerry(
+        selectedYear.toString(),
+        selectedMonth,
+        selectedExperiment,
+        selectedSpecifics,
+        selectedEmployee,
+        selectedDate
+    ).then(() => {
+        filter('experiment');
+    });
+
     document.getElementById("Heading").innerHTML = selectedMonth;
     document.getElementById("subHeading").innerHTML = ("All Contents In " + selectedMonth  + " of " + selectedYear);
 
@@ -237,7 +301,6 @@ async function fetchAndFill(path, getData) {
     }
 }
 
-
 function fill(idName, content) {
     let options = document.getElementById(idName);
     for (let i = options.options.length - 1; i > 0; i--) {
@@ -250,24 +313,26 @@ function fill(idName, content) {
     }
 }
 
-function selectedOption(id, index) {
-    if (document.getElementById(id).selectedIndex === 0) {
-        searchCritera[index] = false;
-    }
-    else {
-        searchCritera[index] = true;
-    }
-    if (id === "experiment") {
-        layer = 1;
-        currentExperiment = document.getElementById(id).value;
-        fetchAndFill(db.collection("Experiments").doc(experimentNames[document.getElementById(id).selectedIndex - 1]), true).then(r => console.log("ignore this log"));
-    } else if (id === "specifics") {
-        currentSpecifics = document.getElementById(id).value;
-    } else if (id === "employee") {
-        currentEmployee = document.getElementById(id).value;
-    } else if (id === "date") {
-        currentDate = document.getElementById(id).value;
-    }
+function closeFeedbackModal() {
+    document.getElementById("feedbackModal").style.display = "none";
+}
+
+function submitFeedback() {
+    const feedback = document.getElementById("feedbackTextarea").value.trim();
+    const path = db.collection("Feedback").doc();
+    const newData = {
+        Ticket: feedback,
+        Timestamp: new Date(),
+    };
+    path.set(newData)
+        .then(() => {
+            console.log("Data successfully uploaded!");
+        })
+        .catch((error) => {
+            console.error("Error uploading document:", error);
+        });
+
+    closeFeedbackModal();
 }
 
 function syncScroll(scrolledCard) {

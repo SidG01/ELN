@@ -11,7 +11,7 @@
     <div class="nav-buttons">
       <button id="searchBtn" class="user" onclick="searchPage()">SEARCH</button>
       <button>Inventory</button>
-      <button>Report Bug / Suggestion</button>
+      <button onclick="document.getElementById('feedbackModal').style.display = 'block'">Report Bug / Suggestion</button>
       <button id="createBtn" class="user" onclick="createNew()">CREATE NEW</button>
       <button id="editBtn" onclick="clickedEdit()" class="edit">EDIT</button>
     </div>
@@ -32,6 +32,23 @@
     <div id="ConjugationButton" onclick="conjugationPage()"></div>
     <div id="CryopreservationButton" onclick="cryoPage()"></div>
     <div id="ScaffoldButton" onclick="scaffoldPage()"></div>
+  </div>
+
+  <div class="custom-modal" id="feedbackModal">
+    <div class="modal-header">
+      <div class="modal-title">Send Feedback</div>
+      <button class="close-button" onclick="closeFeedbackModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <label for="feedbackTextarea" class="feedback-label">Feedback</label>
+      <textarea id="feedbackTextarea" placeholder="Type your bug report or suggestion here..." class="feedback-textarea"></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="outline-btn" onclick="closeFeedbackModal()">Cancel</button>
+      <button class="filled-btn" onclick="submitFeedback()">Submit</button>
+    </div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>

@@ -11,8 +11,9 @@
     <div class="topbar">
         <div class="logo"></div>
         <div class="nav-buttons">
+            <button id="searchBtn" class="user" onclick="location.assign('../Search/SearchDashboard/SearchDashboard.html')">SEARCH</button>
             <button>Inventory</button>
-            <button>Report Bug / Suggestion</button>
+            <button onclick="document.getElementById('feedbackModal').style.display = 'block'">Report Bug / Suggestion</button>
         </div>
     </div>
     <div class="year-navigator">
@@ -86,6 +87,23 @@
         <div class="modal-body" id="modalBody">Body text</div>
         <div class="modal-footer">
             <button class="filled-btn" onclick="closeModal()">Ok</button>
+        </div>
+    </div>
+
+    <div class="custom-modal" id="feedbackModal">
+        <div class="modal-header">
+            <div class="modal-title">Send Feedback</div>
+            <button class="close-button" onclick="closeFeedbackModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <label for="feedbackTextarea" class="feedback-label">Feedback</label>
+            <textarea id="feedbackTextarea" placeholder="Type your bug report or suggestion here..." class="feedback-textarea"></textarea>
+        </div>
+
+        <div class="modal-footer">
+            <button class="outline-btn" onclick="closeFeedbackModal()">Cancel</button>
+            <button class="filled-btn" onclick="submitFeedback()">Submit</button>
         </div>
     </div>
 

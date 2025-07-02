@@ -29,6 +29,7 @@ let fillArray = [];
 
 fetchAndFill(db.collection("Buffer").doc("NewExperiment").collection("Buffer"), false);
 document.getElementById("successModal").style.display = "none";
+document.getElementById("feedbackModal").style.display = "none";
 
 function selectedOption(idName) {
     fillCheck = false;
@@ -630,6 +631,29 @@ function addCardContent() {
         }
     }
 }
+
+function closeFeedbackModal() {
+    document.getElementById("feedbackModal").style.display = "none";
+}
+
+function submitFeedback() {
+    const feedback = document.getElementById("feedbackTextarea").value.trim();
+    const path = db.collection("Feedback").doc();
+    const newData = {
+        Ticket: feedback,
+        Timestamp: new Date(),
+    };
+    path.set(newData)
+        .then(() => {
+            console.log("Data successfully uploaded!");
+        })
+        .catch((error) => {
+            console.error("Error uploading document:", error);
+        });
+
+    closeFeedbackModal();
+}
+
 
 function closeModal() {
     document.getElementById("successModal").style.display = "none";
