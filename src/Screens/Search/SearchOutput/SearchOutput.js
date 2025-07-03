@@ -108,50 +108,86 @@ function searchQuerry(YEAR, MONTH, EXPERIMENT, SPECIFICS, EMPLOYEE, DATE) {
 }
 
 function filter(id) {
-    if (document.getElementById(id).selectedIndex === 0) {
+    if (document.getElementById(id).selectedIndex === 0 && id === 'experiment') {
+        document.getElementById('specifics').selectedIndex = 0;
+        document.getElementById('employee').selectedIndex = 0;
+        document.getElementById('date').value = '';
+        console.log("one")
         for (let i = 0; i < accordionLength; i++) {
             document.getElementById("accordionItem" + (i + 1)).style.display = "";
         }
     }
     else {
+        console.log("two")
         for (let i = 0; i < accordionLength; i++) {
             const titleElement = document.getElementById("accordionTitle" + (i + 1));
             const extractedTitle = titleElement.textContent.split(/\s+\|\s+/)[0].trim();
-            console.log("Full Title:", titleElement.textContent);
-            console.log("Extracted Title:", extractedTitle);
-            if (extractedTitle !== document.getElementById(id).value) {
+            if (extractedTitle !== document.getElementById('experiment').value) {
                 document.getElementById("accordionItem" + (i + 1)).style.display = "none";
             }
             else {
                 document.getElementById("accordionItem" + (i + 1)).style.display = "";
             }
         }
+        if (id === 'experiment' && document.getElementById('experiment').selectedIndex !== 0) {
+            document.getElementById('specifics').selectedIndex = 0;
+            document.getElementById('employee').selectedIndex = 0;
+            document.getElementById('date').value = '';
+        }
+        if (id === 'specifics' && document.getElementById('specifics').selectedIndex !== 0) {
+            console.log("three")
+            for (let i = 0; i < accordionLength; i++) {
+                if (document.getElementById("accordionItem" + (i + 1)).style.display === "") {
+                    if (document.getElementById("accordionContent" + (i + 1)).textContent.includes(document.getElementById(id).value)) {
+                        document.getElementById("accordionItem" + (i + 1)).style.display = "";
+                    }
+                    else {
+                        document.getElementById("accordionItem" + (i + 1)).style.display = "none";
+                    }
+                }
+            }
+        }
     }
-
 }
 
 function selectedOption(id, index) {
     if (document.getElementById(id).selectedIndex === 0) {
         searchCritera[index] = false;
-        for (let i = 0; i < accordionLength; i++) {
-            document.getElementById("accordionItem" + (i + 1)).style.display = "";
-        }
     }
-    else {
-        searchCritera[index] = true;
-        if (id === "experiment") {
-            layer = 1;
-            currentExperiment = document.getElementById(id).value;
-            fetchAndFill(db.collection("Experiments").doc(experimentNames[document.getElementById(id).selectedIndex - 1]), true).then(r => console.log("ignore this log"));
-            filter('experiment')
-        } else if (id === "specifics") {
-            currentSpecifics = document.getElementById(id).value;
-        } else if (id === "employee") {
-            currentEmployee = document.getElementById(id).value;
-        } else if (id === "date") {
-            currentDate = document.getElementById(id).value;
-        }
+
+    if (id === "experiment" && document.getElementById(id).selectedIndex !== 0) {
+        layer = 1;
+        currentExperiment = document.getElementById(id).value;
+        fetchAndFill(db.collection("Experiments").doc(experimentNames[document.getElementById(id).selectedIndex - 1]), true).then(r => console.log("ignore this log"));
+        filter('experiment')
+    } else if (id === "experiment" && document.getElementById(id).selectedIndex === 0) {
+        searchCritera[index] = false;
+        filter('experiment')
     }
+    else if (id === "specifics" && document.getElementById(id).selectedIndex !== 0) {
+        currentSpecifics = document.getElementById(id).value;
+        filter('specifics');
+    } else if (id === "specifics" && document.getElementById(id).selectedIndex === 0) {
+        searchCritera[index] = false;
+        filter('specifics');
+    }
+    else if (id === "employee" && document.getElementById(id).selectedIndex !== 0) {
+        currentEmployee = document.getElementById(id).value;
+        filter('employee');
+    }
+    else if (id === "employee" && document.getElementById(id).selectedIndex === 0) {
+        searchCritera[index] = false;
+        filter('employee');
+    }
+    else if (id === "date" && document.getElementById(id).selectedIndex !== 0) {
+        currentDate = document.getElementById(id).value;
+        filter('date');
+    }
+    else if (id === "date" && document.getElementById(id).selectedIndex === 0) {
+        searchCritera[index] = false;
+        filter('date');
+    }
+
 }
 
 function querryFill(path, titleContent) {
@@ -181,6 +217,7 @@ function querryFill(path, titleContent) {
                 title.id = "accordionTitle" + accordionLength;
                 title.className = "accordion-title";
                 title.textContent = titleContent + "   |   " + doc.id;
+                content.id = "accordionContent" + accordionLength;
                 content.className = "accordion-content";
                 content.textContent = "Loading...";
 
@@ -197,9 +234,13 @@ function querryFill(path, titleContent) {
                 path.doc(doc.id).get().then((docSnap) => {
                     if (docSnap.exists) {
                         const data = docSnap.data();
-                        const rows = Object.entries(data)
-                            .map(([k, v]) => `<tr><td class="key">${k}</td><td>${v}</td></tr>`)
-                            .join("");
+                        const rows = Object.entries(data).map(([key, value]) => `
+    <tr>
+        <td class="key">${key}</td>
+        <td>${formatValue(value)}</td>
+    </tr>
+`).join("");
+
 
                         content.innerHTML = `<table class="accordion-table"><tbody>${rows}</tbody></table>`;
                     }
@@ -213,8 +254,18 @@ function querryFill(path, titleContent) {
 
 function formatValue(value) {
     if (Array.isArray(value)) {
-        value.join(", ");
-    } else if (typeof value === "object" && value !== null) {
+        if (value.length === 0) {
+            return `<div class="array-empty">(empty array)</div>`;
+        }
+
+        return `
+            <div class="array-inline">
+                ${value.map(item => `<span class="array-tag">${item}</span>`).join(" ")}
+            </div>
+        `;
+    }
+
+    if (typeof value === "object" && value !== null) {
         let inner = "<div class='nested-table'>";
         for (const [k, v] of Object.entries(value)) {
             inner += `
@@ -226,10 +277,12 @@ function formatValue(value) {
         }
         inner += "</div>";
         return inner;
-    } else {
-        return value;
     }
+
+    return value;
 }
+
+
 
 function prevMonth() {
     if (currentMonthIndex === 1) {
@@ -257,16 +310,7 @@ function nextMonth() {
         currentMonthIndex = months.indexOf(selectedMonth) + 1;
         selectedMonth = months[currentMonthIndex];
     }
-    searchQuerry(
-        selectedYear.toString(),
-        selectedMonth,
-        selectedExperiment,
-        selectedSpecifics,
-        selectedEmployee,
-        selectedDate
-    ).then(() => {
-        filter('experiment');
-    });
+    searchQuerry(selectedYear.toString(), selectedMonth, selectedExperiment, selectedSpecifics, selectedEmployee, selectedDate)
 
     document.getElementById("Heading").innerHTML = selectedMonth;
     document.getElementById("subHeading").innerHTML = ("All Contents In " + selectedMonth  + " of " + selectedYear);
