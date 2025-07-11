@@ -158,8 +158,8 @@ function selectedOption(id, index) {
     if (id === "experiment" && document.getElementById(id).selectedIndex !== 0) {
         layer = 1;
         currentExperiment = document.getElementById(id).value;
-        fetchAndFill(db.collection("Experiments").doc(experimentNames[document.getElementById(id).selectedIndex - 1]), true).then(r => console.log("ignore this log"));
-        filter('experiment')
+        fetchAndFill(db.collection("Experiments").doc(experimentNames[document.getElementById(id).selectedIndex - 1]), true).then(r => filter('experiment'));
+        // filter('experiment')
     } else if (id === "experiment" && document.getElementById(id).selectedIndex === 0) {
         searchCritera[index] = false;
         filter('experiment')

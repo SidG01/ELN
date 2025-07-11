@@ -8,9 +8,7 @@ let employees = []
 let employeeCheck = []
 let employeeUsed = [];
 
-let currentBuffer = "CHOOSE BUFFER";
-let currentX = "1"
-
+let currentX = "Choose First"
 let materialsID = ["X"]
 let XArray = [];
 let XDescArray = [];
@@ -26,7 +24,7 @@ function selectedOption(idName) {
     if (document.getElementById(idName).selectedIndex === 0) {
         document.getElementById("XC").style.border = "3px double red";
         document.getElementById("XC").style.padding = "5px";
-        currentWS = "Choose First";
+        currentX = "Choose First";
         fillBatchNumber(currentX);
     }
     else {
@@ -55,7 +53,7 @@ function fetchAndFill(path, getData) {
             const promises = [];
             querySnapshot.forEach((doc) => {
                 fillArray.push(doc.id);
-                ingredientsArray.push(doc.id);
+                XArray.push(doc.id);
                 const promise = fetchAndFillData(path.doc(doc.id));
                 promises.push(promise);
             });
@@ -162,7 +160,7 @@ function fillBatchNumber(currentX) {
     if (d.getDate() < 10) {
         day = "0" + d.getDate();
     }
-    batchNumber = "WS" + "-" + currentX + "-"  + (month) + (day) + (d.getFullYear()) + ".";
+    batchNumber = "WS" + "-" + currentX + "."  + (month) + (day) + (d.getFullYear()) + ".";
     for (let i = 0; i < employeeUsed.length; i++) {
         batchNumber += employeeUsed[i]
     }
@@ -187,6 +185,74 @@ function employeeClicked(index) {
     fillBatchNumber(currentX);
 }
 
+function upload() {
+    let safeToUpload = true;
+    if (document.getElementById("ProjectName").selectedIndex === 0) {
+        safeToUpload = false;
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Selection";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please make sure all selections are made before saving.";
+    }
+    else if (employeeUsed.length === 0) {
+        safeToUpload = false;
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Employee Selection";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please select at least one employee before saving.";
+    }
+    else if (!itemCheck) {
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Item Text";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please type in the Item field of this experiment.";
+    }
+    else if (volumesCheck.includes(false)) {
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Volume added";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please fill all Volumes added.";
+    }
+    else {
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        const d = new Date();
+        let month = months[d.getMonth()];
+        console.log(d.getFullYear())
+        const path = db.collection("PCR")
+            .doc(d.getFullYear().toString())
+            .collection(month)
+            .doc(batchNumber.toString());
+        console.log(path);
+        const newData = {};
+
+        for (let i = 0; i < reagantsAray.length; i++) {
+            const name = reagantsAray[i];
+            newData[name] = {
+                "Single Reaction Volume": reactionVolArray[i],
+                "Volume to Add": volumeArray[i],
+                "Volume Added": addedArray[i],
+            };
+        }
+        newData["Item Description"] = document.getElementById("itemName").value;
+        newData["# of Tubes"] = document.getElementById("numTubes").value
+        newData.Notes = document.getElementById("notes").value
+
+        path.set(newData)
+            .then(() => {
+                console.log("Data successfully uploaded!");
+            })
+            .catch((error) => {
+                console.error("Error uploading document:", error);
+            });
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Successfully uploaded experiment!";
+        document.getElementById("modalTitle").style.color = "green"
+        document.getElementById("modalBody").textContent = "Navigate through history in the nav bar OR search using the provided options";
+    }
+}
+
+//edit
 async function updateDB(ingredient, ingredientD, weight ,weightD, concentration, concentrationD) {
     const mainRef = db
         .collection("X")
@@ -270,6 +336,17 @@ function addCardContent() {
 
 function closeFeedbackModal() {
     document.getElementById("feedbackModal").style.display = "none";
+}
+
+function syncScroll(scrolledCard) {
+    const cards = document.querySelectorAll('.info-card');
+    const scrollLocation = scrolledCard.scrollTop;
+
+    cards.forEach(card => {
+        if (card !== scrolledCard) {
+            card.scrollTop = scrollLocation;
+        }
+    });
 }
 
 function submitFeedback() {

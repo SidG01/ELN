@@ -677,7 +677,8 @@ body {
 .nested-key {
     font-weight: bold;
     color: #444;
-    flex: 1 1 40%;
+    flex: 1 1 150%;
+    text-align: left;
 }
 
 .nested-value {

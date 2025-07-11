@@ -21,21 +21,21 @@
         <div class="top-row">
             <div class="dropdown-group">
                 <label id="ProjectNameC" >
-                    Working Stock
+                    Project Name
                     <select id="ProjectName" onchange="selectedOption('ProjectName')">
                         <option>Choose First</option>
                         <option>First</option>
                     </select>
                 </label>
 
-                <label>
+                <label id="itemNameC" >
                     Item
-                    <input type="text" value="" />
+                    <input id="itemName" oninput="inputItem()" type="text" value="" />
                 </label>
 
                 <label>
                     # of Tubes
-                    <input type="text" value="" />
+                    <input id="numTubes" oninput="calculate()" type="text" value="1"/>
                 </label>
             </div>
 
@@ -63,7 +63,7 @@
                 <div class="info-text">Standard 110</div>
                 <div class="info-description">Batch info</div>
             </div>
-            <div class="info-card" onscroll="syncScroll(this)" id="SingleReactionVolCard">
+            <div class="info-card" onscroll="syncScroll(this)" id="Reaction VolumeCard">
                 <div class="info-name">Reaction Volume</div>
                 <div class="info-divider"></div>
                 <div class="info-text">0</div>
@@ -80,7 +80,7 @@
                 <div class="info-description">Batch info</div>
             </div>
             <div class="info-card" onscroll="syncScroll(this)" id="VolumeCard">
-                <div class="info-name">Volume</div>
+                <div class="info-name">Volume to add</div>
                 <div class="info-divider"></div>
                 <div class="info-text">0</div>
                 <div class="info-description">Batch info</div>
@@ -96,7 +96,7 @@
                 <div class="info-description">Batch info</div>
             </div>
             <div class="info-card" onscroll="syncScroll(this)" id="AddedCard">
-                <div class="info-name">Amount Added </div>
+                <div class="info-name">Volume Added </div>
                 <div class="info-divider"></div>
                 <div class="info-text">0</div>
                 <div class="info-description">Batch info</div>
@@ -116,7 +116,7 @@
                     # of Cycles
                     <input type="text" value="" />
                 </label>
-                <button class="protocol">Thermocycler Protocol</button>
+                <button onclick="openThermoModal()" class="open-modal-btn">Thermocycler Protocol</button>
                 <label>Assigned To</label>
                 <div class="tags">
                     <span id="employeeBtn0" onclick="employeeClicked(0)" class="tag">PH</span>
@@ -137,6 +137,27 @@
     </main>
     <div id="back-button-container" onclick="location.href='../../index.html'">
         <button id="back-button">← Back</button>
+    </div>
+
+    <div class="custom-modal" id="thermoModal" style="display: none;">
+        <div class="modal-header">
+            <div class="modal-title">Thermocycler Protocol</div>
+            <button class="close-button" onclick="closeThermoModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <table class="thermo-table" id="thermoTable">
+                <thead>
+                <tr>
+                    <th>Temperature</th>
+                    <th>Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+        </div>
     </div>
 
     <div class="custom-modal" id="successModal">
