@@ -9,7 +9,7 @@ let employeeCheck = []
 let employeeUsed = [];
 
 let currentProjectID = "Choose First";
-let reactionVolArray = []
+let reactionVolumeArray = []
 let reactionDescArray = []
 let toAddArray = []
 let toAddDescArray = []
@@ -18,7 +18,7 @@ let volumesCheck = []
 let itemCheck = false;
 let numTubes = document.getElementById("numTubes").value;
 
-let materialsID = ["Reagants", "Reaction Volume", "Volume", "Added"]
+let materialsID = ["Reagants", "ReactionVolume", "Volume", "Added"]
 let reagantsArray = [];
 let reagantsDescArray = [];
 
@@ -105,10 +105,10 @@ function fetchAndFill(path, getData) {
 
 function calculate() {
     numTubes = document.getElementById("numTubes").value;
-    console.log(reactionVolArray);
+    console.log(reactionVolumeArray);
     newVolArray = [];
-    for(let i = 0; i<reactionVolArray.length; i++) {
-        newVolArray[i] = reactionVolArray[i] * numTubes;
+    for(let i = 0; i<reactionVolumeArray.length; i++) {
+        newVolArray[i] = reactionVolumeArray[i] * numTubes;
     }
     console.log(newVolArray);
     fillMaterials("VolumeCard", newVolArray, "Volume to add");
@@ -118,7 +118,7 @@ function fetchAndFillData(path) {
     return path.get().then((docSnapshot) => {
         if (docSnapshot.exists) {
             const data = docSnapshot.data();
-            reactionVolArray.push(docSnapshot.data()["Reaction Volume"]);
+            reactionVolumeArray.push(docSnapshot.data()["Reaction Volume"]);
 
             const XtextDiv = document.createElement('div');
             const XdescDiv = document.createElement('div');
@@ -317,7 +317,7 @@ function upload() {
     }
     else {
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        console.log(reactionVolArray);
+        console.log(reactionVolumeArray);
         console.log(toAddArray)
         console.log(addedArray);
         const d = new Date();
@@ -333,7 +333,7 @@ function upload() {
         for (let i = 0; i < reagantsArray.length; i++) {
             const name = reagantsArray[i];
             newData[name] = {
-                "Single Reaction Volume": reactionVolArray[i],
+                "Single Reaction Volume": reactionVolumeArray[i],
                 "Volume to Add": toAddArray[i],
                 "Volume Added": addedArray[i],
             };
@@ -356,13 +356,92 @@ function upload() {
     }
 }
 
-async function updateDB(ingredient, ingredientD, weight ,weightD, concentration, concentrationD) {
+function clickedEdit() {
+    const arrays = {
+        reagantsArray: [],
+        reagantsDescArray: [],
+        reactionvolumeArray: [],
+        reactionvolumeDescArray: [],
+    };
+    if (currentProjectID !== "Choose First") {
+        if (!editMode) {
+            editMode = true;
+            document.getElementById("editBtn").innerHTML = "SAVE";
+            document.querySelectorAll('.info-card').forEach(card => {
+                if (card.id === 'ReagantsCard' || card.id === 'ReactionVolumeCard') {
+                    card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = div.textContent;
+                        input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                        input.style.border = "2px solid green";
+                        input.style.fontSize = "15px";
+                        input.style.marginBottom = "4px";
+                        const field = card.id;
+                        input.setAttribute('data-card', field);
+                        div.replaceWith(input);
+                    });
+                }
+                else {
+                    document.getElementById(card.id).disabled = true;
+                }
+            });
+            for(let i = 0; i < materialsID.length - 2; i++) {
+                let tempCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+                const button = document.createElement('button');
+                button.className = 'action-button'; // Optional: style class
+                button.textContent = 'Add More Content';
+                button.onclick = addCardContent;
+                tempCard.appendChild(button);
+            }
+        } else {
+            editMode = false;
+            document.getElementById("editBtn").innerHTML = "EDIT";
+            for (const key in arrays) {
+                arrays[key] = [];
+            }
+            document.querySelectorAll('.info-card').forEach(card => {
+                const cardId = card.id.toLowerCase().replace("card", "");
+
+                const inputs = card.querySelectorAll('input');
+                inputs.forEach((input, index) => {
+                    const isText = input.getAttribute('data-type') === 'text';
+                    const arrayName = cardId + (isText ? 'Array' : 'DescArray');
+
+                    if (arrays[arrayName]) {
+                        arrays[arrayName].push(input.value);
+                    }
+
+                    const newDiv = document.createElement('div');
+                    newDiv.className = isText ? 'info-text' : 'info-description';
+                    newDiv.textContent = input.value;
+                    input.replaceWith(newDiv);
+                });
+            });
+            console.log(arrays);
+            for(let i = 0; i < materialsID.length - 2; i++) {
+                infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+                const children = infoCard.children;
+                infoCard.removeChild(children[children.length - 1]);
+            }
+            updateDB(arrays.reagantsArray, arrays.reagantsDescArray, arrays.reactionvolumeArray, arrays.reactionvolumeDescArray);
+        }
+    }
+    else {
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error";
+        document.getElementById("modalTitle").style.color = "red";
+        document.getElementById("modalBody").textContent = "Please select a Working Stock to edit.";
+    }
+}
+
+async function updateDB(reagant, reagantD, reactionV ,reactionVD) {
     const mainRef = db
-        .collection("X")
+        .collection("PCR")
         .doc("NewExperiment")
-        .collection("X")
-        .doc(X)
-        .collection("X");
+        .collection("ProjectName")
+        .doc(currentProjectID)
+        .collection("Reagants");
 
     const snapshot = await mainRef.get();
     const deletePromises = [];
@@ -370,26 +449,23 @@ async function updateDB(ingredient, ingredientD, weight ,weightD, concentration,
         deletePromises.push(mainRef.doc(doc.id).delete());
     });
     await Promise.all(deletePromises);
-    console.log("All existing X documents deleted.");
+    console.log("All existing PCR documents deleted.");
 
     const addPromises = [];
-    for (let i = 0; i < X.length; i++) {
+    for (let i = 0; i < reagant.length; i++) {
         const docData = {
-            X: X[i],
-            X: X[i],
-            X: X[i],
-            X: X[i],
-            X: X[i],
+            "Reaction Volume": reactionV[i],
+            "Reaction VolumeDesc": reactionVD[i],
         };
         console.log(docData);
-        addPromises.push(mainRef.doc(X[i]).set(docData));
+        addPromises.push(mainRef.doc(reagant[i]).set(docData));
     }
     await Promise.all(addPromises);
-    console.log("New Buffer documents added.");
+    console.log("New PCR documents added.");
     document.getElementById("successModal").style.display = "block";
     document.getElementById("modalTitle").textContent = "Edit saved successfully to the Database";
     document.getElementById("modalTitle").style.color = "green"
-    document.getElementById("modalBody").textContent = "This change will now be reflected in this X template.";
+    document.getElementById("modalBody").textContent = "This change will now be reflected in this PCR template.";
 }
 
 function addCardContent() {
@@ -427,7 +503,7 @@ function addCardContent() {
         });
 
         const button = document.createElement('button');
-        button.className = 'action-button'; // Optional: style class
+        button.className = 'action-button';
         button.textContent = 'Add More Content';
 
         button.onclick = addCardContent;

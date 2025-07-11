@@ -349,6 +349,86 @@ function syncScroll(scrolledCard) {
     });
 }
 
+function clickedEdit() {
+    const arrays = {
+        partsArray: [],
+        partsDescArray: [],
+        volumeArray: [],
+        volumeDescArray: [],
+        prestocksArray: []
+    };
+    if (currentWS !== "CHOOSE WORKING STOCK") {
+        if (!editMode) {
+            editMode = true;
+            document.getElementById("editBtn").innerHTML = "SAVE";
+            document.querySelectorAll('.info-card').forEach(card => {
+                card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = div.textContent;
+                    input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
+                    input.style.border = "2px solid green";
+                    input.style.fontSize = "15px";
+                    input.style.gap = "4px";
+                    const field = card.id;
+                    input.setAttribute('data-card', field);
+                    div.replaceWith(input);
+                    tempLength+= 0.5;
+                });
+            });
+            for(let i = 0; i < materialsID.length; i++) {
+                let tempCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+                const button = document.createElement('button');
+                button.className = 'action-button'; // Optional: style class
+                button.textContent = 'Add More Content';
+
+                button.onclick = addCardContent;
+
+                tempCard.appendChild(button);
+            }
+
+            console.log(tempLength / 3)
+        } else {
+            editMode = false;
+            document.getElementById("editBtn").innerHTML = "EDIT";
+            for (const key in arrays) {
+                arrays[key] = [];
+            }
+            document.querySelectorAll('.info-card').forEach(card => {
+                const cardId = card.id.toLowerCase().replace("card", "");
+
+                const inputs = card.querySelectorAll('input');
+                inputs.forEach((input, index) => {
+                    const isText = input.getAttribute('data-type') === 'text';
+                    const arrayName = cardId + (isText ? 'Array' : 'DescArray');
+
+                    if (arrays[arrayName]) {
+                        arrays[arrayName].push(input.value);
+                    }
+
+                    const newDiv = document.createElement('div');
+                    newDiv.className = isText ? 'info-text' : 'info-description';
+                    newDiv.textContent = input.value;
+                    input.replaceWith(newDiv);
+                });
+            });
+            console.log(arrays);
+            for(let i = 0; i < materialsID.length; i++) {
+                infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+                const children = infoCard.children;
+                infoCard.removeChild(children[children.length - 1]);
+            }
+            updatePreStocks(arrays.prestocksArray, arrays.partsArray, arrays.partsDescArray, arrays.volumeArray, arrays.volumeDescArray);
+        }
+    }
+    else {
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error";
+        document.getElementById("modalTitle").style.color = "red";
+        document.getElementById("modalBody").textContent = "Please select a Working Stock to edit.";
+    }
+}
+
 function submitFeedback() {
     const feedback = document.getElementById("feedbackTextarea").value.trim();
     if (feedback !== "") {
