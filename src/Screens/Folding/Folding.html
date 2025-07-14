@@ -12,7 +12,7 @@
     <div class="logo"></div>
     <div class="nav-buttons">
         <button>Inventory</button>
-        <button>Report Bug / Suggestion</button>
+        <button onclick="document.getElementById('feedbackModal').style.display = 'block'">Report Bug / Suggestion</button>
         <button id="createBtn" class="user" onclick="createNew()" >CREATE NEW</button>
         <button id="editBtn" onclick="clickedEdit()" class="edit">EDIT</button>
     </div>
@@ -22,19 +22,19 @@
     <div class="top-row">
         <div class="dropdown-group">
             <label id="StructureC" >
-                Buffer Name
+                Structure Name
                 <select id="Structure" onchange="selectedOption('Structure')">
-                    <option>A2H4</option>
+                    <option>Choose First</option>
                     <option>DOVAC66</option>
                 </select>
             </label>
             <label>
                 Volume (uL)
-                <input type="text" value="" />
+                <input id="TVolume" type="text" value="50" />
             </label>
             <label>
                 Working Stock Parts
-                <input type="text" value="" />
+                <input id="WSParts" type="text" value="" />
             </label>
         </div>
     </div>
@@ -63,15 +63,15 @@
             <div class="info-name">Concentration</div>
             <div class="info-divider"></div>
             <div class="info-text">VB -</div>
-            <div class="info-description">Batch info</div>
+            <div class="info-description">Units</div>
             <div class="info-text">Top Core MODIFIED </div>
-            <div class="info-description">Batch info</div>
+            <div class="info-description">Units</div>
             <div class="info-text">Top Arm </div>
-            <div class="info-description">Batch info</div>
+            <div class="info-description">Units</div>
             <div class="info-text">Bottom Arm </div>
-            <div class="info-description">Batch info</div>
+            <div class="info-description">Units</div>
             <div class="info-text">Standards</div>
-            <div class="info-description">Batch info</div>
+            <div class="info-description">Units</div>
         </div>
 
         <div class="info-card" onscroll="syncScroll(this)" id="PercentageCard">
@@ -103,36 +103,14 @@
             <div class="info-text">Standards</div>
             <div class="info-description">Batch info</div>
         </div>
-        <div class="checkboxes">
-            <label>
-                <input type="checkbox" id="mixCheck">
-                <div>
-                    Mix Items
-                    <span>Description</span>
-                </div>
-            </label>
-            <label>
-                <input type="checkbox" id="thermalRampCheck">
-                <div>
-                    Thermal Ramp
-                    <span>Description</span>
-                </div>
-            </label>
-            <label>
-                <input type="checkbox" id="filterCheck">
-                <div>
-                    Filter Buffer
-                    <span>Description</span>
-                </div>
-            </label>
-            <div class="form-card">
-                <label>Assigned To</label>
-                <div class="tags">
-                    <span id="employeeBtn0" onclick="employeeClicked(0)" class="tag">PH</span>
-                    <span id="employeeBtn1" onclick="employeeClicked(1)" class="tag">SG</span>
-                    <span id="employeeBtn2" onclick="employeeClicked(2)" class="tag">KT</span>
-                    <span id="employeeBtn3" onclick="employeeClicked(3)" class="tag">CL</span>
-                </div>
+        <div class="form-card">
+            <button onclick="openThermoModal()" class="open-modal-btn">Thermocycler Protocol</button>
+            <label>Assigned To</label>
+            <div class="tags">
+                <span id="employeeBtn0" onclick="employeeClicked(0)" class="tag">PH</span>
+                <span id="employeeBtn1" onclick="employeeClicked(1)" class="tag">SG</span>
+                <span id="employeeBtn2" onclick="employeeClicked(2)" class="tag">KT</span>
+                <span id="employeeBtn3" onclick="employeeClicked(3)" class="tag">CL</span>
             </div>
         </div>
     </div>
