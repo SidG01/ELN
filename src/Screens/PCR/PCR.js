@@ -694,15 +694,20 @@ function syncScroll(scrolledCard) {
 
 function submitFeedback() {
     const feedback = document.getElementById("feedbackTextarea").value.trim();
-    if (feedback !== "") {
-        console.log("Submitted Feedback:", feedback);
-        // Add Firebase or server logic here if needed
+    const path = db.collection("Feedback").doc();
+    const newData = {
+        Ticket: feedback,
+        Timestamp: new Date(),
+    };
+    path.set(newData)
+        .then(() => {
+            console.log("Data successfully uploaded!");
+        })
+        .catch((error) => {
+            console.error("Error uploading document:", error);
+        });
 
-        closeFeedbackModal(); // Auto-close after submit
-        alert("Thank you for your feedback!");
-    } else {
-        alert("Please enter your feedback before submitting.");
-    }
+    closeFeedbackModal();
 }
 
 function closeModal() {

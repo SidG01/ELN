@@ -272,11 +272,8 @@ async function updateDB(ingredient, ingredientD, weight ,weightD, concentration,
     const addPromises = [];
     for (let i = 0; i < X.length; i++) {
         const docData = {
-            X: X[i],
-            X: X[i],
-            X: X[i],
-            X: X[i],
-            X: X[i],
+            "X": X[i],
+            "X": X[i],
         };
         console.log(docData);
         addPromises.push(mainRef.doc(X[i]).set(docData));
@@ -347,6 +344,172 @@ function syncScroll(scrolledCard) {
             card.scrollTop = scrollLocation;
         }
     });
+}
+
+function createNew() {
+    const arrays = {
+        reagantsArray: [],
+        reagantsDescArray: [],
+        reactionvolumeArray: [],
+        reactionvolumeDescArray: [],
+    };
+    if (!createMode) {
+        createMode = true;
+
+        // clear dropdowns
+        let options = document.getElementById("ProjectName");
+        for (let i = options.options.length - 1; i >= 0; i--) {
+            options.remove(i);
+        }
+        let newOption = document.createElement("option");
+        options.options.add(newOption);
+
+        let infoCard;
+        for (let i = 0; i < materialsID.length - 2; i++) {
+            infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+            const children = infoCard.children;
+            for (let i = children.length - 1; i >= 0; i--) {
+                if (!children[i].classList.contains('info-name') && !children[i].classList.contains('info-divider')) {
+                    infoCard.removeChild(children[i]);
+                }
+            }
+        }
+
+        addCardContent()
+        document.getElementById("createBtn").innerHTML = "SAVE NEW";
+
+        const dropdownGroup = document.querySelector('.dropdown-group');
+        const selects = dropdownGroup.querySelectorAll('select');
+
+        selects.forEach(select => {
+            if (select.id === "ProjectName") {
+                select.style.display = 'none';
+                const inputContainer = document.createElement('div');
+                inputContainer.className = 'input-container';
+
+                Array.from(select.options).forEach(option => {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = option.text;
+                    input.className = 'option-edit';
+                    inputContainer.appendChild(input);
+                });
+                select.dataset.inputContainerId = `inputs-${select.id}`;
+                inputContainer.id = select.dataset.inputContainerId;
+                select.parentNode.appendChild(inputContainer);
+            }
+        });
+    }
+    else {
+        let safeToCreate = true;
+        if (document.getElementById("ProjectName").value !== "" && document.getElementById("ProjectName").value !== null) {
+            safeToCreate = true;
+            document.getElementById("ProjectNameC").style.border = "";
+            document.getElementById("ProjectNameC").style.padding = "";
+        } else {
+            safeToCreate = false;
+            document.getElementById("ProjectNameC").style.border = "3px double red";
+            document.getElementById("ProjectNameC").style.padding = "5px";
+        }
+        if (document.getElementById("itemName").value !== "" && document.getElementById("itemName").value !== null) {
+            safeToCreate = true;
+            document.getElementById("itemNameC").style.border = "";
+            document.getElementById("itemNameC").style.padding = "";
+        } else {
+            safeToCreate = false;
+            document.getElementById("itemNameC").style.border = "3px double red";
+            document.getElementById("itemNameC").style.padding = "5px";
+        }
+        if (safeToCreate) {
+            createMode = false;
+            document.getElementById("createBtn").innerHTML = "CREATE NEW";
+            for (let i = 0; i < materialsID.length - 2; i++) {
+                infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+                const children = infoCard.children;
+                infoCard.removeChild(children[children.length - 1]);
+            }
+            for (const key in arrays) {
+                arrays[key] = [];
+            }
+            document.querySelectorAll('.info-card').forEach(card => {
+                if (card.id !== "VolumeCard" && card.id !== "AddedCard") {
+                    const cardId = card.id.toLowerCase().replace("card", "");
+                    const inputs = card.querySelectorAll('input');
+                    inputs.forEach((input, index) => {
+                        const isText = input.getAttribute('data-type') === 'text';
+                        const arrayName = cardId + (isText ? 'Array' : 'DescArray');
+
+                        if (arrays[arrayName]) {
+                            arrays[arrayName].push(input.value);
+                        }
+
+                        const newDiv = document.createElement('div');
+                        newDiv.className = isText ? 'info-text' : 'info-description';
+                        newDiv.textContent = input.value;
+                        input.replaceWith(newDiv);
+                    });
+                }
+            });
+            const dropdownGroup = document.querySelector('.dropdown-group');
+            const selects = dropdownGroup.querySelectorAll('select');
+
+            selects.forEach(select => {
+                if (select.id === "ProjectName") {
+                    const inputContainerId = select.dataset.inputContainerId;
+                    const inputContainer = document.getElementById(inputContainerId);
+                    const inputs = inputContainer.querySelectorAll('input');
+                    select.innerHTML = '';
+
+                    inputs.forEach(input => {
+                        const option = document.createElement('option');
+                        option.text = input.value;
+                        select.add(option);
+                    });
+                    inputContainer.remove();
+                    select.style.display = 'inline-block';
+                }
+            });
+            currentProjectID = document.getElementById("ProjectName").value;
+            console.log(arrays)
+            db.collection("PCR")
+                .doc("NewExperiment")
+                .collection("ProjectName")
+                .doc(currentProjectID)
+                .set({createdAt: firebase.firestore.FieldValue.serverTimestamp()})
+                .then(() => {
+                    console.log("current doc now initialized");
+                });
+            for(let i = 0; i < arrays.reagantsArray.length; i++) {
+                let docRef = db.collection("PCR")
+                    .doc("NewExperiment")
+                    .collection("ProjectName")
+                    .doc(currentProjectID)
+                    .collection("Reagants")
+                    .doc(arrays.reagantsArray[i])
+
+                docRef.set({
+                    "Reaction Volume": arrays.reactionvolumeArray[i],
+                    "Reaction VolumeDesc": arrays.reactionvolumeDescArray[i],
+                }).then(() => {
+                    console.log("Data updated successfully!");
+                }).catch((error) => {
+                    console.error("Error updating Data:", error);
+                });
+            }
+            document.getElementById("successModal").style.display = "block";
+            document.getElementById("modalTitle").textContent = "New Template Created";
+            document.getElementById("modalTitle").style.color = "green"
+            document.getElementById("modalBody").textContent = "You can now use this template for future Buffer entries.";
+            fetchAndFill(db.collection("PCR").doc("NewExperiment").collection("ProjectName"), false);
+            calculate()
+        }
+        else {
+            document.getElementById("successModal").style.display = "block";
+            document.getElementById("modalTitle").textContent = "Error: Missing Selection";
+            document.getElementById("modalTitle").style.color = "red"
+            document.getElementById("modalBody").textContent = "Please make sure all selections are made before saving.";
+        }
+    }
 }
 
 function clickedEdit() {
@@ -431,15 +594,20 @@ function clickedEdit() {
 
 function submitFeedback() {
     const feedback = document.getElementById("feedbackTextarea").value.trim();
-    if (feedback !== "") {
-        console.log("Submitted Feedback:", feedback);
-        // Add Firebase or server logic here if needed
+    const path = db.collection("Feedback").doc();
+    const newData = {
+        Ticket: feedback,
+        Timestamp: new Date(),
+    };
+    path.set(newData)
+        .then(() => {
+            console.log("Data successfully uploaded!");
+        })
+        .catch((error) => {
+            console.error("Error uploading document:", error);
+        });
 
-        closeFeedbackModal(); // Auto-close after submit
-        alert("Thank you for your feedback!");
-    } else {
-        alert("Please enter your feedback before submitting.");
-    }
+    closeFeedbackModal();
 }
 
 function closeModal() {

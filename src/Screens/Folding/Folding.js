@@ -108,7 +108,7 @@ function fetchAndFillData(path) {
             X1textDiv.className = 'info-text';
             X1textDiv.textContent = data.Percentage + "%";
             X1descDiv.className = 'info-description';
-            X1descDiv.textContent = "micro liters";
+            X1descDiv.textContent = "per concentration";
             document.getElementById(materialsID[2] + "Card").appendChild(X1textDiv);
             document.getElementById(materialsID[2] + "Card").appendChild(X1descDiv);
         } else {
@@ -134,7 +134,7 @@ function fillMaterials(cardId, content, descContent) {
 
         const descDiv = document.createElement('div');
         descDiv.className = 'info-description';
-        descDiv.textContent = "batch number";
+        descDiv.textContent = descContent;
 
         infoCard.appendChild(textDiv);
         infoCard.appendChild(descDiv);
@@ -254,86 +254,46 @@ function upload() {
     }
 }
 
-//edit
-async function updateDB(ingredient, ingredientD, weight ,weightD, concentration, concentrationD) {
-    const mainRef = db
-        .collection("X")
-        .doc("NewExperiment")
-        .collection("X")
-        .doc(X)
-        .collection("X");
-
-    const snapshot = await mainRef.get();
-    const deletePromises = [];
-    snapshot.forEach(doc => {
-        deletePromises.push(mainRef.doc(doc.id).delete());
-    });
-    await Promise.all(deletePromises);
-    console.log("All existing X documents deleted.");
-
-    const addPromises = [];
-    for (let i = 0; i < X.length; i++) {
-        const docData = {
-            X: X[i],
-            X: X[i],
-            X: X[i],
-            X: X[i],
-            X: X[i],
-        };
-        console.log(docData);
-        addPromises.push(mainRef.doc(X[i]).set(docData));
-    }
-    await Promise.all(addPromises);
-    console.log("New Buffer documents added.");
-    document.getElementById("successModal").style.display = "block";
-    document.getElementById("modalTitle").textContent = "Edit saved successfully to the Database";
-    document.getElementById("modalTitle").style.color = "green"
-    document.getElementById("modalBody").textContent = "This change will now be reflected in this X template.";
-}
-
 function addCardContent() {
-    for(let i = 0; i < materialsID.length; i++) {
-        infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+    for (let i = 0; i < materialsID.length; i++) {
+        const infoCard = document.querySelector(`#${materialsID[i]}Card`);
         const children = infoCard.children;
-        if (children[children.length - 1].classList.contains('action-button')) {
+
+        if (children.length > 0 && children[children.length - 1].classList.contains('action-button')) {
             infoCard.removeChild(children[children.length - 1]);
-
         }
-        const textDiv = document.createElement('div');
-        textDiv.className = 'info-text';
-        textDiv.textContent = "Add Content Here";
 
-        const descDiv = document.createElement('div');
-        descDiv.className = 'info-description';
-        descDiv.textContent = "Add Description Here";
+        if (infoCard.id !== 'VolumeCard') {
+            const textDiv = document.createElement('div');
+            textDiv.className = 'info-text';
+            textDiv.textContent = "Add Content Here";
 
-        infoCard.appendChild(textDiv);
-        infoCard.appendChild(descDiv);
+            const descDiv = document.createElement('div');
+            descDiv.className = 'info-description';
+            descDiv.textContent = "Add Description Here";
 
-        document.querySelectorAll('.info-card').forEach(card => {
-            card.querySelectorAll('.info-text, .info-description').forEach((div, index) => {
+            infoCard.appendChild(textDiv);
+            infoCard.appendChild(descDiv);
+
+            infoCard.querySelectorAll('.info-text, .info-description').forEach((div) => {
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.value = div.textContent;
                 input.setAttribute('data-type', div.classList.contains('info-text') ? 'text' : 'desc');
                 input.style.border = "2px solid green";
                 input.style.fontSize = "15px";
-                input.style.gap = "4px";
-                const field = card.id;
-                input.setAttribute('data-card', field);
+                input.style.marginBottom = "4px";
+                input.setAttribute('data-card', infoCard.id);
                 div.replaceWith(input);
             });
-        });
 
-        const button = document.createElement('button');
-        button.className = 'action-button'; // Optional: style class
-        button.textContent = 'Add More Content';
-
-        button.onclick = addCardContent;
-
-        infoCard.appendChild(button);
+            const button = document.createElement('button');
+            button.className = 'action-button';
+            button.textContent = 'Add More Content';
+            button.onclick = addCardContent;
+            infoCard.appendChild(button);
+        }
     }
-
 }
 
 function closeFeedbackModal() {
@@ -351,15 +311,186 @@ function syncScroll(scrolledCard) {
     });
 }
 
+function createNew() {
+    const arrays = {
+        ingredientsArray: [],
+        concentrationArray: [],
+        concentrationDescArray: [],
+        percentageArray: [],
+    };
+    if (!createMode) {
+        createMode = true;
+
+        // clear dropdowns
+        let options = document.getElementById("Structure");
+        for (let i = options.options.length - 1; i >= 0; i--) {
+            options.remove(i);
+        }
+        let newOption = document.createElement("option");
+        options.options.add(newOption);
+
+        let infoCard;
+        for (let i = 0; i < materialsID.length - 1; i++) {
+            infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+            const children = infoCard.children;
+            for (let i = children.length - 1; i >= 0; i--) {
+                if (!children[i].classList.contains('info-name') && !children[i].classList.contains('info-divider')) {
+                    infoCard.removeChild(children[i]);
+                }
+            }
+        }
+
+        addCardContent()
+        document.getElementById("createBtn").innerHTML = "SAVE NEW";
+
+        const dropdownGroup = document.querySelector('.dropdown-group');
+        const selects = dropdownGroup.querySelectorAll('select');
+
+        selects.forEach(select => {
+            if (select.id === "Structure") {
+                select.style.display = 'none';
+                const inputContainer = document.createElement('div');
+                inputContainer.className = 'input-container';
+
+                Array.from(select.options).forEach(option => {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = option.text;
+                    input.className = 'option-edit';
+                    inputContainer.appendChild(input);
+                });
+                select.dataset.inputContainerId = `inputs-${select.id}`;
+                inputContainer.id = select.dataset.inputContainerId;
+                select.parentNode.appendChild(inputContainer);
+            }
+        });
+        document.getElementById("StructureC").style.border = "3px double green";
+        document.getElementById("StructureC").style.padding = "5px";
+        document.getElementById("WSPartsC").style.border = "3px double green";
+        document.getElementById("WSPartsC").style.padding = "5px";
+    }
+    else {
+        let safeToCreate = true;
+        if (document.getElementById("Structure").value !== "" && document.getElementById("ProjectName").value !== null) {
+            safeToCreate = true;
+            document.getElementById("StructureC").style.border = "";
+            document.getElementById("StructureC").style.padding = "";
+        } else {
+            safeToCreate = false;
+            document.getElementById("StructureC").style.border = "3px double red";
+            document.getElementById("StructureC").style.padding = "5px";
+        }
+        if (document.getElementById("WSParts").value !== "" && document.getElementById("WSParts").value !== null) {
+            safeToCreate = true;
+            document.getElementById("WSPartsC").style.border = "";
+            document.getElementById("WSPartsC").style.padding = "";
+        } else {
+            safeToCreate = false;
+            document.getElementById("WSPartsC").style.border = "3px double red";
+            document.getElementById("WSPartsC").style.padding = "5px";
+        }
+        if (safeToCreate) {
+            createMode = false;
+            document.getElementById("createBtn").innerHTML = "CREATE NEW";
+            for (let i = 0; i < materialsID.length - 1; i++) {
+                infoCard = document.querySelector(`#${materialsID[i] + "Card"}`);
+                const children = infoCard.children;
+                infoCard.removeChild(children[children.length - 1]);
+            }
+            for (const key in arrays) {
+                arrays[key] = [];
+            }
+            document.querySelectorAll('.info-card').forEach(card => {
+                if (card.id !== "VolumeCard") {
+                    const cardId = card.id.toLowerCase().replace("card", "");
+                    const inputs = card.querySelectorAll('input');
+                    inputs.forEach((input, index) => {
+                        const isText = input.getAttribute('data-type') === 'text';
+                        const arrayName = cardId + (isText ? 'Array' : 'DescArray');
+
+                        if (arrays[arrayName]) {
+                            arrays[arrayName].push(input.value);
+                        }
+
+                        const newDiv = document.createElement('div');
+                        newDiv.className = isText ? 'info-text' : 'info-description';
+                        newDiv.textContent = input.value;
+                        input.replaceWith(newDiv);
+                    });
+                }
+            });
+            const dropdownGroup = document.querySelector('.dropdown-group');
+            const selects = dropdownGroup.querySelectorAll('select');
+
+            selects.forEach(select => {
+                if (select.id === "Structure") {
+                    const inputContainerId = select.dataset.inputContainerId;
+                    const inputContainer = document.getElementById(inputContainerId);
+                    const inputs = inputContainer.querySelectorAll('input');
+                    select.innerHTML = '';
+
+                    inputs.forEach(input => {
+                        const option = document.createElement('option');
+                        option.text = input.value;
+                        select.add(option);
+                    });
+                    inputContainer.remove();
+                    select.style.display = 'inline-block';
+                }
+            });
+            currentStructure = document.getElementById("Structure").value;
+            console.log(arrays)
+            db.collection("Folding")
+                .doc("NewExperiment")
+                .collection("Structure")
+                .doc(currentStructure)
+                .set({createdAt: firebase.firestore.FieldValue.serverTimestamp()})
+                .then(() => {
+                    console.log("current doc now initialized");
+                });
+            for(let i = 0; i < arrays.ingredientsArray.length; i++) {
+                let docRef = db.collection("Folding")
+                    .doc("NewExperiment")
+                    .collection("Structure")
+                    .doc(currentStructure)
+                    .collection("Ingredients")
+                    .doc(arrays.ingredientsArray[i])
+
+                docRef.set({
+                    "Concentration": arrays.concentrationArray[i],
+                    "Percentage": arrays.percentageArray[i],
+                    "Unit": arrays.concentrationDescArray[i],
+                    "WS Parts": document.getElementById("WSParts").value
+                }).then(() => {
+                    console.log("Data updated successfully!");
+                }).catch((error) => {
+                    console.error("Error updating Data:", error);
+                });
+            }
+            document.getElementById("successModal").style.display = "block";
+            document.getElementById("modalTitle").textContent = "New Template Created";
+            document.getElementById("modalTitle").style.color = "green"
+            document.getElementById("modalBody").textContent = "You can now use this template for future Buffer entries.";
+            fetchAndFill(db.collection("Folding").doc("NewExperiment").collection("Structure"), false);
+            calculate()
+        }
+        else {
+            document.getElementById("successModal").style.display = "block";
+            document.getElementById("modalTitle").textContent = "Error: Missing Selection";
+            document.getElementById("modalTitle").style.color = "red"
+            document.getElementById("modalBody").textContent = "Please make sure all selections are made before saving.";
+        }
+    }
+}
+
 function clickedEdit() {
     const arrays = {
-        partsArray: [],
-        partsDescArray: [],
-        volumeArray: [],
-        volumeDescArray: [],
-        prestocksArray: []
+        ingredientsArray: [],
+        concentrationArray: [],
+        concentrationDescArray: [],
+        percentageArray: [],
     };
-    if (currentWS !== "CHOOSE WORKING STOCK") {
+    if (currentStructure !== "Choose First") {
         if (!editMode) {
             editMode = true;
             document.getElementById("editBtn").innerHTML = "SAVE";
@@ -375,21 +506,18 @@ function clickedEdit() {
                     const field = card.id;
                     input.setAttribute('data-card', field);
                     div.replaceWith(input);
-                    tempLength+= 0.5;
                 });
             });
             for(let i = 0; i < materialsID.length; i++) {
                 let tempCard = document.querySelector(`#${materialsID[i] + "Card"}`);
                 const button = document.createElement('button');
-                button.className = 'action-button'; // Optional: style class
+                button.className = 'action-button';
                 button.textContent = 'Add More Content';
 
                 button.onclick = addCardContent;
 
                 tempCard.appendChild(button);
             }
-
-            console.log(tempLength / 3)
         } else {
             editMode = false;
             document.getElementById("editBtn").innerHTML = "EDIT";
@@ -420,7 +548,7 @@ function clickedEdit() {
                 const children = infoCard.children;
                 infoCard.removeChild(children[children.length - 1]);
             }
-            updatePreStocks(arrays.prestocksArray, arrays.partsArray, arrays.partsDescArray, arrays.volumeArray, arrays.volumeDescArray);
+            updateDB(arrays.concentrationArray, arrays.concentrationDescArray, arrays.percentageArray, arrays.ingredientsArray);
         }
     }
     else {
@@ -431,17 +559,57 @@ function clickedEdit() {
     }
 }
 
+async function updateDB(ConcentrationA, ConcentrationDA, PercentageA ,IngredientsA) {
+    const mainRef = db
+        .collection("Folding")
+        .doc("NewExperiment")
+        .collection("Structure")
+        .doc(currentStructure)
+        .collection("Ingredients");
+
+    const snapshot = await mainRef.get();
+    const deletePromises = [];
+    snapshot.forEach(doc => {
+        deletePromises.push(mainRef.doc(doc.id).delete());
+    });
+    await Promise.all(deletePromises);
+    console.log("All existing Folding documents deleted.");
+
+    const addPromises = [];
+    for (let i = 0; i < IngredientsA.length; i++) {
+        const docData = {
+            "Concentration": ConcentrationA[i],
+            "Percentage": PercentageA[i],
+            "Unit": ConcentrationDA[i],
+            "WS Parts": document.getElementById("WSParts").value
+        };
+        console.log(docData);
+        addPromises.push(mainRef.doc(IngredientsA[i]).set(docData));
+    }
+    await Promise.all(addPromises);
+    console.log("New Buffer documents added.");
+    document.getElementById("successModal").style.display = "block";
+    document.getElementById("modalTitle").textContent = "Edit saved successfully to the Database";
+    document.getElementById("modalTitle").style.color = "green"
+    document.getElementById("modalBody").textContent = "This change will now be reflected in this X template.";
+}
+
 function submitFeedback() {
     const feedback = document.getElementById("feedbackTextarea").value.trim();
-    if (feedback !== "") {
-        console.log("Submitted Feedback:", feedback);
-        // Add Firebase or server logic here if needed
+    const path = db.collection("Feedback").doc();
+    const newData = {
+        Ticket: feedback,
+        Timestamp: new Date(),
+    };
+    path.set(newData)
+        .then(() => {
+            console.log("Data successfully uploaded!");
+        })
+        .catch((error) => {
+            console.error("Error uploading document:", error);
+        });
 
-        closeFeedbackModal(); // Auto-close after submit
-        alert("Thank you for your feedback!");
-    } else {
-        alert("Please enter your feedback before submitting.");
-    }
+    closeFeedbackModal();
 }
 
 function closeModal() {

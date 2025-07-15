@@ -32,7 +32,7 @@
                 Volume (uL)
                 <input id="TVolume" type="text" value="50" />
             </label>
-            <label>
+            <label id="WSPartsC">
                 Working Stock Parts
                 <input id="WSParts" type="text" value="" />
             </label>
@@ -47,61 +47,25 @@
         <div class="info-card" onscroll="syncScroll(this)" id="IngredientsCard">
             <div class="info-name">Ingredients</div>
             <div class="info-divider"></div>
-            <div class="info-text">VB -</div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Top Core MODIFIED </div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Top Arm OH Replacements</div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Bottom Arm OH Replacements</div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Standards</div>
-            <div class="info-description">Batch info</div>
+
         </div>
 
         <div class="info-card" onscroll="syncScroll(this)" id="ConcentrationCard">
             <div class="info-name">Concentration</div>
             <div class="info-divider"></div>
-            <div class="info-text">VB -</div>
-            <div class="info-description">Units</div>
-            <div class="info-text">Top Core MODIFIED </div>
-            <div class="info-description">Units</div>
-            <div class="info-text">Top Arm </div>
-            <div class="info-description">Units</div>
-            <div class="info-text">Bottom Arm </div>
-            <div class="info-description">Units</div>
-            <div class="info-text">Standards</div>
-            <div class="info-description">Units</div>
+
         </div>
 
         <div class="info-card" onscroll="syncScroll(this)" id="PercentageCard">
             <div class="info-name">Percentage</div>
             <div class="info-divider"></div>
-            <div class="info-text">VB -</div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Top Core MODIFIED </div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Top Arm </div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Bottom </div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Standards</div>
-            <div class="info-description">Batch info</div>
+
         </div>
 
         <div class="info-card" onscroll="syncScroll(this)" id="VolumeCard">
             <div class="info-name">Volume (uL) to Add</div>
             <div class="info-divider"></div>
-            <div class="info-text">VB -</div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Top Core MODIFIED </div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Top Arm </div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Bottom </div>
-            <div class="info-description">Batch info</div>
-            <div class="info-text">Standards</div>
-            <div class="info-description">Batch info</div>
+
         </div>
         <div class="form-card">
             <button onclick="openThermoModal()" class="open-modal-btn">Thermocycler Protocol</button>
@@ -135,6 +99,23 @@
     <div class="modal-body" id="modalBody">Body text</div>
     <div class="modal-footer">
         <button class="filled-btn" onclick="closeModal()">Ok</button>
+    </div>
+</div>
+
+<div class="custom-modal" id="feedbackModal">
+    <div class="modal-header">
+        <div class="modal-title">Send Feedback</div>
+        <button class="close-button" onclick="closeFeedbackModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+        <label for="feedbackTextarea" class="feedback-label">Feedback</label>
+        <textarea id="feedbackTextarea" placeholder="Type your bug report or suggestion here..." class="feedback-textarea"></textarea>
+    </div>
+
+    <div class="modal-footer">
+        <button class="outline-btn" onclick="closeFeedbackModal()">Cancel</button>
+        <button class="filled-btn" onclick="submitFeedback()">Submit</button>
     </div>
 </div>
 
