@@ -88,6 +88,19 @@
     </div>
 </main>
 
+<div class="custom-modal" id="thermoModal" style="display: none;">
+    <div class="modal-header">
+        <div id="thermoTitle" class="modal-title">Thermocycler Protocol</div>
+        <button class="close-button" onclick="closeThermoModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+        <div id="thermoRows"></div>
+        <button onclick="addThermoRow()" id="addStepBtn">+ Add Step</button>
+
+    </div>
+</div>
+
 <div id="back-button-container" onclick="location.href='../../index.html'">
     <button onclick="window.history.back()" id="back-button">← Back</button>
 </div>

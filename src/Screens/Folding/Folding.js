@@ -16,6 +16,9 @@ let concentrationArray = [];
 let concentrationDescArray = [];
 let percentageArray = [];
 let percentageDescArray = [];
+let thermoTempArray = [];
+let thermoTimeArray = [];
+let thermoItem = 0;
 
 employees = ["PH", "SG", "KT", "CL"]
 
@@ -23,6 +26,7 @@ let fillArray = [];
 
 fetchAndFill(db.collection("Folding").doc("NewExperiment").collection("Structure"), false);
 document.getElementById("successModal").style.display = "none";
+document.getElementById("feedbackModal").style.display = "none";
 document.getElementById("StructureC").style.border = "3px double red";
 document.getElementById("StructureC").style.padding = "5px";
 
@@ -216,6 +220,13 @@ function upload() {
         document.getElementById("modalTitle").style.color = "red"
         document.getElementById("modalBody").textContent = "Please select at least one employee before saving.";
     }
+    else if (thermoItem === 0 || document.getElementById("thermoTemp").value === "" || document.getElementById("thermoTime").value === "") {
+        safeToUpload = false;
+        document.getElementById("successModal").style.display = "block";
+        document.getElementById("modalTitle").textContent = "Error: Missing Thermocycler input";
+        document.getElementById("modalTitle").style.color = "red"
+        document.getElementById("modalBody").textContent = "Please input thermocycler temperature and timings correctly.";
+    }
     else {
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -234,6 +245,13 @@ function upload() {
             newData[name] = {
                 "Concentration": concentrationArray[i],
                 "Unit": concentrationDescArray[i],
+            };
+        }
+        for (let i = 0; i < thermoItem; i++) {
+            const name = "Thermocycler Run " + (i + 1).toString();
+            newData[name] = {
+                "Temperature": document.getElementById("thermoTemp" + (i + 1)).value,
+                "Time": document.getElementById("thermoTime" + (i + 1)).value,
             };
         }
         newData["Total Volume"] = document.getElementById("TVolume").value;
@@ -592,6 +610,35 @@ async function updateDB(ConcentrationA, ConcentrationDA, PercentageA ,Ingredient
     document.getElementById("modalTitle").textContent = "Edit saved successfully to the Database";
     document.getElementById("modalTitle").style.color = "green"
     document.getElementById("modalBody").textContent = "This change will now be reflected in this X template.";
+}
+
+function addThermoRow() {
+    thermoItem++;
+    const container = document.getElementById("thermoRows");
+    const row = document.createElement("div");
+    const tempInput = document.createElement("input");
+    const timeInput = document.createElement("input");
+
+    row.className = "thermo-row";
+    tempInput.type = "text";
+    tempInput.placeholder = "Temperature";
+    tempInput.id = "thermoTemp" + thermoItem.toString();
+    timeInput.type = "text";
+    timeInput.placeholder = "Time";
+    timeInput.id = "thermoTime" + thermoItem.toString();
+
+    row.appendChild(tempInput);
+    row.appendChild(timeInput);
+    container.appendChild(row);
+}
+
+
+async function openThermoModal() {
+    document.getElementById('thermoModal').style.display = 'block';
+}
+
+function closeThermoModal() {
+    document.getElementById('thermoModal').style.display = 'none';
 }
 
 function submitFeedback() {

@@ -429,5 +429,34 @@ main {
     font-size: 14px;
 }
 
+#thermoRows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
+.thermo-row {
+    display: flex;
+    gap: 10px;
+}
+
+.thermo-row input {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#addStepBtn {
+    margin-top: 15px;
+    padding: 8px 12px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 14px;
+}
 
