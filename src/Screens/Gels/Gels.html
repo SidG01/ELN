@@ -6,16 +6,125 @@
     <link rel="stylesheet" href="Gels.css" />
 </head>
 <body>
-    <div class="topbar">
-        <div class="logo"></div>
-        <div class="nav-buttons">
-            <button>Inventory</button>
-            <button>Report Bug / Suggestion</button>
-            <button id="createBtn" class="user" onclick="createNew()" >CREATE NEW</button>
-            <button id="editBtn" onclick="clickedEdit()" class="edit">EDIT</button>
+<div class="topbar">
+    <div class="logo"></div>
+    <div class="nav-buttons">
+        <button id="searchBtn" class="user" onclick="searchPage()">SEARCH</button>
+        <button>Inventory</button>
+        <button onclick="document.getElementById('feedbackModal').style.display = 'block'">Report Bug / Suggestion</button>
+        <button id="createBtn" class="user" onclick="createNew()" >CREATE NEW</button>
+        <button id="editBtn" onclick="clickedEdit()" class="edit">EDIT</button>
+    </div>
+</div>
+
+<main>
+    <div class="top-row">
+        <div class="dropdown-group">
+            <label id="itemNameC">
+                Item Name
+                <input id="itemName" type="text" value="" />
+            </label>
+            <label id="AgeroseC">
+                Agerose Percentage
+                <select id="Agerose" onchange="selectedOption('Agerose')">
+                    <option>Choose First</option>
+                    <option>DOVAC66</option>
+                </select>
+            </label>
+            <label id="SizeC">
+                Rig Size
+                <select id="Size" onchange="selectedOption('Size')">
+                    <option>Choose First</option>
+                    <option>DOVAC66</option>
+                </select>
+            </label>
         </div>
     </div>
 
+    <div class="batch-field">
+        <label>Batch #
+            <input id="batchNumber" type="text">
+        </label>
+    </div>
+    <div class="scroll-wrapper">
+    <div class="info-columns">
+        <div class="info-card" onscroll="syncScroll(this)" id="SampleCard">
+            <div class="info-name">Sample Loaded</div>
+            <div class="info-divider"></div>
+            <div class="dropdown-wrapper">
+                <label id="SampleC1" class="dropdown-label">Sample Chosen</label>
+                <select id="Sample1" onchange="selectedOption('Sample1')" class="dropdown-select">
+                    <option>Choose First</option>
+                    <option>DOVAC66</option>
+                </select>
+            </div>
+        </div>
+        <div class="info-card" onscroll="syncScroll(this)" id="ConcentrationCard">
+            <div class="info-name">Concentration</div>
+            <div class="info-divider"></div>
+        </div>
+        <div class="info-card" onscroll="syncScroll(this)" id="VolumeCard">
+            <div class="info-name">Volume (uL) to Add</div>
+            <div class="info-divider"></div>
+        </div>
+        <div class="info-card" onscroll="syncScroll(this)" id="DilutionCard">
+            <div class="info-name">Dilution ID</div>
+            <div class="info-divider"></div>
+        </div>
+        <div class="info-card" onscroll="syncScroll(this)" id="DyeCard">
+            <div class="info-name">Dye</div>
+            <div class="info-divider"></div>
+        </div>
+        <div class="info-card" onscroll="syncScroll(this)" id="SingleStrandCard">
+            <div class="info-name">Single Stranded?</div>
+            <div class="info-divider"></div>
+        </div>
+        <div class="info-card" onscroll="syncScroll(this)" id="WeightCard">
+            <div class="info-name">Molecular Weight</div>
+            <div class="info-divider"></div>
+        </div>
+        <div class="info-card" onscroll="syncScroll(this)" id="MassCard">
+            <div class="info-name">Mass Loaded</div>
+            <div class="info-divider"></div>
+        </div>
+        <div class="info-card" onscroll="syncScroll(this)" id="CutCard">
+            <div class="info-name">Cut?</div>
+            <div class="info-divider"></div>
+        </div>
+    </div>
+    <div class="form-card sticky-form">
+        <button onclick="openThermoModal()" class="open-modal-btn">Thermocycler Protocol</button>
+        <label>Assigned To</label>
+        <div class="tags">
+            <span id="employeeBtn0" onclick="employeeClicked(0)" class="tag">PH</span>
+            <span id="employeeBtn1" onclick="employeeClicked(1)" class="tag">SG</span>
+            <span id="employeeBtn2" onclick="employeeClicked(2)" class="tag">KT</span>
+            <span id="employeeBtn3" onclick="employeeClicked(3)" class="tag">CL</span>
+        </div>
+    </div>
+    </div>
+    <div class="notes-section">
+        <label>Notes</label>
+        <textarea id = "notes"></textarea>
+    </div>
+    <div class="bottom-actions">
+        <button class="procedure">📄 Procedure</button>
+        <button class="upload" onclick="upload()" >⤴ Upload</button>
+    </div>
+</main>
+
+    <div class="custom-modal" id="gelModal" style="display: none;">
+    <div class="modal-header">
+        <div id="thermoTitle" class="modal-title">Gel Content</div>
+        <button class="close-button" onclick="closeThermoModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+        <div id="thermoRows"></div>
+        <button onclick="addThermoRow()" id="addStepBtn">+ Add Step</button>
+
+    </div>
+</div>
 
     <div id="back-button-container" onclick="location.href='../../index.html'">
         <button id="back-button">← Back</button>
@@ -32,8 +141,26 @@
         </div>
     </div>
 
+    <div class="custom-modal" id="feedbackModal">
+    <div class="modal-header">
+        <div class="modal-title">Send Feedback</div>
+        <button class="close-button" onclick="closeFeedbackModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+        <label for="feedbackTextarea" class="feedback-label">Feedback</label>
+        <textarea id="feedbackTextarea" placeholder="Type your bug report or suggestion here..." class="feedback-textarea"></textarea>
+    </div>
+
+    <div class="modal-footer">
+        <button class="outline-btn" onclick="closeFeedbackModal()">Cancel</button>
+        <button class="filled-btn" onclick="submitFeedback()">Submit</button>
+    </div>
+</div>
+
     <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore-compat.js"></script>
+    <script src="../../firebaseConfig.js"></script>
     <script src="Gels.js"></script>
 
 </body>
